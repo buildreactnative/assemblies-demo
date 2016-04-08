@@ -7,34 +7,33 @@ import React, {
   AppRegistry,
   Component,
   NavigatorIOS,
+  Navigator,
   StyleSheet,
 } from 'react-native';
 
 import Landing from './application/components/Landing';
+import Dashboard from './application/components/Dashboard';
 
 class assembliesTutorial extends Component {
   render() {
     return (
-      <NavigatorIOS
-        style={styles.container}
-        barTintColor='#3A7BD2'
-        titleTextColor='#FFFFFF'
-        tintColor='#FFFFFF'
-        shadowHidden={true}
-        translucent={false}
+      <Navigator
+        style={{flex: 1}}
         initialRoute={{
-          component: Landing,
-          title: 'Landing'
+          name: 'Landing'
         }}
+        renderScene={(route, navigator) => {
+          switch(route.name){
+            case 'Landing':
+              return <Landing navigator={navigator} />
+            case 'Dashboard':
+              return <Dashboard navigator={navigator} />
+          }
+        }}
+        configureScene={() => Navigator.SceneConfigs.FadeAndroid}
       />
     );
   }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+};
 
 AppRegistry.registerComponent('assembliesTutorial', () => assembliesTutorial);

@@ -1,27 +1,32 @@
-import React from 'react-native';
-import Dashboard from './Dashboard';
+import NavigationBar from 'react-native-navbar';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-let {
+import React, {
   View,
   Text,
   StyleSheet,
   Component,
   TouchableOpacity,
-} = React;
+} from 'react-native';
 
 export default class Landing extends Component{
   render(){
     return (
-      <View style={styles.container}>
-        <Text style={styles.h1}>This is Landing</Text>
-        <TouchableOpacity onPress={() => {
-            this.props.navigator.push({
-              title: 'Dashboard',
-              component: Dashboard,
-            })
-          }}>
-          <Text>Go to Dashboard</Text>
-        </TouchableOpacity>
+      <View style={{flex: 1,}}>
+        <NavigationBar
+          title={{title: 'Landing', tintColor: 'white'}}
+          tintColor='#3A7BD2'
+        />
+        <View style={styles.container}>
+          <Text style={styles.h1}>This is Landing</Text>
+          <TouchableOpacity onPress={() => {
+              this.props.navigator.push({
+                name: 'Dashboard'
+              })
+            }}>
+            <Text>Go to Dashboard</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
