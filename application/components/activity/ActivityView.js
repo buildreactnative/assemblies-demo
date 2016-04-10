@@ -14,7 +14,7 @@ export default class ActivityView extends Component{
     return (
       <View style={{ flex: 1 }}>
         <NavigationBar
-          title={{ title: 'Profile', tintColor: 'white' }}
+          title={{ title: 'Activity', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
         />
         <View style={styles.container}>
