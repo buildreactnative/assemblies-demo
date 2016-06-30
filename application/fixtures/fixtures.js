@@ -3,7 +3,7 @@ const FAKE_USERS = [
   { id: 1, firstName: 'Dan', lastName: 'Abramov', avatarUrl: 'https://pbs.twimg.com/profile_images/553711083064541184/9VsY9i09.jpeg' },
   { id: 2, firstName: 'Marc', lastName: 'Andreessen', avatarUrl: 'https://pbs.twimg.com/profile_images/649108987128868864/rWnwMe55.jpg'},
   { id: 3, firstName: 'Nick', lastName: 'Brown', avatarUrl: 'https://pbs.twimg.com/profile_images/652242629556609024/nRgVcSMq.jpg'},
-  { id: 4, firstName: 'Brent', lastName: 'Vatne', avatarUrl: 'https://pbs.twimg.com/profile_images/552276339709837313/eeDvc1SP.jpeg'},
+  { id: 4, firstName: 'Brent', lastName: 'Vatne', avatarUrl: 'https://codecore.ca/assets/team/brent-5b7ed4ae6cedceb4e5a7df9ba1fada5e.jpg'},
   { id: 5, firstName: 'Kanye', lastName: 'West', avatarUrl: 'https://pbs.twimg.com/profile_images/585565077207678977/N_eNSBXi.jpg'},
 ];
 
@@ -88,7 +88,48 @@ FAKE_USERS.forEach((user) => {
 });
 
 
-let notifications = [];
+const upcomingEvent = {
+  start: new Date(new Date().valueOf() + 3*24*60*60*1000),
+  end: new Date(new Date().valueOf() + 3*27*60*60*1000),
+  name: 'React Native NYC Meetup',
+  summary: 'React Native enables you to build world-class application experiences on native platforms using a consistent developer experience based on JavaScript and React. The focus of React Native is on developer efficiency across all the platforms you care about — learn once, write anywhere. Facebook uses React Native in multiple production apps and will continue investing in React Native.',
+  attending: {'6': true },
+  maybe: { },
+  notAttending : { },
+  location : {
+    "lat": -27.4679542,
+    "lng": 153.0063908,
+    "city": {
+      "long_name": "Milton",
+      "short_name": "Milton",
+      "types": [
+        "locality",
+        "political"
+      ]
+    },
+    "state": {
+      "long_name": "Queensland",
+      "short_name": "QLD",
+      "types": [
+                      "administrative_area_level_1",
+                      "political"
+      ]
+    },
+    "formattedAddressess": "Black St & Paten St, Milton QLD 4064, Australia"
+  },
+  comments: [],
+  capacity: 100,
+  groupId: 1,
+};
+
+const notifications = [
+  {time: randomDate().valueOf(), message: 'new message from Kanye', type: 'Message', seen: false,},
+  {time: randomDate().valueOf(), message: 'comment in React Native NYC', type: 'Event', seen: false,},
+  {time: randomDate().valueOf(), message: 'new members in React Native NYC', type: 'Group', seen: false,},
+  {time: randomDate().valueOf(), message: 'new message from Nick', type: 'Message', seen: false,},
+  {time: randomDate().valueOf(), message: 'new event in JavaScript', type: 'Event', seen: false,},
+]
+
 
 let userGroups = [];
 
@@ -96,4 +137,4 @@ let suggestedGroups = [];
 
 let events = [];
 
-module.exports = { currentUser, notifications, messages, userGroups, suggestedGroups, events };
+module.exports = { currentUser, notifications, messages, userGroups, suggestedGroups, events, upcomingEvent, FAKE_USERS };
