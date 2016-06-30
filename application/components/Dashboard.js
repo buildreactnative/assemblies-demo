@@ -1,44 +1,55 @@
 import React, { Component } from 'react';
 
 import {
+  Dimensions,
+  TabBarIOS,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import NavigationBar from 'react-native-navbar';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon, { TabBarItemIOS } from 'react-native-vector-icons/Ionicons';
+import ProfileView from './profile/ProfileView';
+import MessagesView from './messages/MessagesView';
+import ActivityView from './activity/ActivityView';
 
 export default class Dashboard extends Component{
-  _renderBackButton(){
-    return (
-      <TouchableOpacity
-        onPress={() => this.props.navigator.pop()}
-        style={styles.backBtn}>
-        <Icon name='ios-arrow-back' size={25} color='white' />
-      </TouchableOpacity>
-    )
+  constructor(props){
+    super(props);
+    this.state = {
+      selectedTab: 'Activity',
+    };
   }
-  render(){
+  render() {
+    let { selectedTab } = this.state;
     return (
-      <View style={styles.outerContainer}>
-        <NavigationBar
-          title={{title: 'Dashboard', tintColor: 'white'}}
-          tintColor='#3A7BD2'
-          leftButton={this._renderBackButton()}
-        />
-        <View style={styles.container}>
-          <Text style={styles.h1}>This is Dashboard</Text>
-          <TouchableOpacity onPress={() => {
-              this.props.navigator.push({
-                name: 'Landing'
-              })
-            }}>
-            <Text>Go to Landing</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TabBarIOS style={styles.outerContainer}>
+        <TabBarItemIOS
+          title='Activity'
+          selected={ selectedTab == 'Activity' }
+          iconName='ios-pulse'
+          onPress={() => this.setState({ selectedTab: 'Activity' })}
+        >
+          <ActivityView />
+        </TabBarItemIOS>
+        <TabBarItemIOS
+          title='Messages'
+          selected={ selectedTab == 'Messages' }
+          iconName='ios-chatboxes'
+          onPress={() => this.setState({ selectedTab: 'Messages' })}
+        >
+          <MessagesView />
+        </TabBarItemIOS>
+        <TabBarItemIOS
+          title='Profile'
+          selected={ selectedTab == 'Profile' }
+          iconName='ios-person'
+          onPress={() => this.setState({ selectedTab: 'Profile' })}
+        >
+          <ProfileView />
+        </TabBarItemIOS>
+      </TabBarIOS>
     );
   }
 };
