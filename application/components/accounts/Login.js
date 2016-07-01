@@ -10,7 +10,7 @@ import {
 import Globals from '../../styles/globals';
 import Colors from '../../styles/colors';
 import NavigationBar from 'react-native-navbar';
-import { DEV, API } from '../../config/config';
+import { DEV, API } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 

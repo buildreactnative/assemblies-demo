@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class ProfileView extends Component{
   render() {
-    let { currentUser } = this.props;
+    let { currentUser, logout } = this.props;
     console.log('CURRENT USER', currentUser);
     return (
       <View style={styles.outerContainer}>
@@ -46,7 +46,7 @@ export default class ProfileView extends Component{
               <Icon name='ios-arrow-forward' size={30} color='#ccc' />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </ScrollView>
