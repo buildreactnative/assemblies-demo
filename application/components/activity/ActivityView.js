@@ -29,7 +29,7 @@ export default class ActivityView extends Component{
   componentDidMount(){
     InteractionManager.runAfterInteractions(() => {
       this.setState({ ready: true })
-    })
+    });
   }
 
   _renderNotification(notification){

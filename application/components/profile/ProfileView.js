@@ -12,10 +12,11 @@ import {
 import NavigationBar from 'react-native-navbar';
 import Colors from '../../styles/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { currentUser } from '../../fixtures/fixtures';
+// import { currentUser } from '../../fixtures/fixtures';
 
 export default class ProfileView extends Component{
   render() {
+    let { currentUser } = this.props;
     console.log('CURRENT USER', currentUser);
     return (
       <View style={styles.outerContainer}>

@@ -10,6 +10,7 @@ import {
 import Globals from '../../styles/globals';
 import Colors from '../../styles/colors';
 import NavigationBar from 'react-native-navbar';
+import { DEV, API } from '../../config/config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -25,7 +26,49 @@ class Login extends Component{
     };
   }
   loginUser(){
-    console.log('Logging in...');
+    if (DEV) { console.log('Logging in...'); }
+    let { email, password } = this.state;
+    let { updateUser } = this.props;
+    fetch(`${API}/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: email,
+        password: password
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 401){
+        this.setState({ errorMsg: 'Email or password was incorrect.' });
+      } else {
+        fetch(`${API}/users/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Set-Cookie': `sid=${data.id}`
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (DEV){ console.log('Logged in user: ', data); }
+          updateUser(data);
+          this.props.navigator.push({
+            name: 'Dashboard'
+          })
+        }).catch(err => {
+          if (DEV) { console.log('Connection error ', err); }
+          this.setState({ errorMsg: 'Connection error.' });
+        })
+        .done();
+      }
+    }).catch(err => {
+      if (DEV) { console.log('Connection error ', err); }
+      this.setState({ errorMsg: 'Connection error.' });
+    })
+    .done();
   }
   render(){
     let { errorMsg } = this.state;
@@ -70,7 +113,7 @@ class Login extends Component{
             />
           </View>
           <View style={styles.error}>
-            <Text>{errorMsg}</Text>
+            <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
         </ScrollView>
         <TouchableOpacity style={Globals.submitButton} onPress={this.loginUser}>
@@ -107,6 +150,12 @@ let styles = {
   },
   error: {
     backgroundColor: Colors.inactive,
+    paddingHorizontal: 15,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: 'red'
   },
   buttonText: {
     color: 'white',

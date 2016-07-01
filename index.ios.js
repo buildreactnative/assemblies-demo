@@ -17,7 +17,18 @@ import Register from './application/components/accounts/Register';
 import Login from './application/components/accounts/Login';
 
 class assemblies extends Component {
+  constructor(){
+    super();
+    this.updateUser = this.updateUser.bind(this);
+    this.state = {
+      user: null
+    }
+  }
+  updateUser(user){
+    this.setState({ user: user });
+  }
   render() {
+    let { user } = this.state;
     return (
       <Navigator
       initialRoute={{name: 'Landing', index: 0}}
@@ -27,11 +38,21 @@ class assemblies extends Component {
             return <Landing navigator={navigator} />
             break;
           case 'Dashboard':
-            return <Dashboard navigator={navigator} />
+            return (
+              <Dashboard
+                navigator={navigator}
+                currentUser={user}
+              />
+            );
           case 'Register':
             return <Register navigator={navigator} />
           case 'Login':
-            return <Login navigator={navigator} />
+            return (
+              <Login
+                navigator={navigator}
+                updateUser={this.updateUser}
+              />
+            );
             break;
           }
         }}
