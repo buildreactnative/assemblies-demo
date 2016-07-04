@@ -22,7 +22,7 @@ let globals = StyleSheet.create({
     paddingRight: 20,
     backgroundColor: 'transparent',
     paddingBottom: 20,
-    paddingTop: 0,
+    paddingTop: 10,
     width: 50,
     height: 50,
   },

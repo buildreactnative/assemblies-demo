@@ -11,6 +11,7 @@ import Globals from '../../styles/globals';
 import Colors from '../../styles/colors';
 import NavigationBar from 'react-native-navbar';
 import { DEV, API } from '../../config';
+import LeftButton from './LeftButton';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -72,9 +73,11 @@ class Login extends Component{
   }
   render(){
     let { errorMsg } = this.state;
+    let { navigator } = this.props;
     return (
       <View style={styles.container}>
         <NavigationBar
+          leftButton={<LeftButton navigator={navigator} />}
           title={{ title: 'Login', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
         />
