@@ -79,7 +79,76 @@ class Register extends Component{
               predefinedPlaces={[]}>
             </GooglePlacesAutocomplete>
           </View>
+          <Text style={styles.h4}>* Email</Text>
+
+          <View ref="email" style={styles.formField}>
+            <TextInput
+              ref="emailField"
+              returnKeyType="next"
+              onSubmitEditing={() => this.refs.passwordField.focus()}
+              onChangeText={(text) => this.setState({email: text})}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              maxLength={144}
+              placeholderTextColor='#bbb'
+              style={styles.input}
+              placeholder="Your email address"
+            />
+          </View>
+          <Text style={styles.h4}>* Password</Text>
+
+          <View style={styles.formField} ref="password">
+            <TextInput
+              ref="passwordField"
+              returnKeyType="next"
+              onSubmitEditing={() => this.refs.firstNameField.focus()}
+              onChangeText={(text) => this.setState({password: text})}
+              secureTextEntry={true}
+              autoCapitalize="none"
+              maxLength={20}
+              placeholderTextColor='#bbb'
+              style={styles.input}
+              placeholder="Your password"
+            />
+          </View>
+          <Text style={styles.h4}>* First Name</Text>
+          <View style={styles.formField} ref="firstName">
+            <TextInput
+              ref="firstNameField"
+              returnKeyType="next"
+              onSubmitEditing={() => this.refs.lastNameField.focus()}
+              maxLength={20}
+              onChangeText={(text) => this.setState({ firstName: text})}
+              placeholderTextColor='#bbb'
+              style={styles.input}
+              placeholder="Your first name"
+            />
+          </View>
+          <Text style={styles.h4}>* Last name</Text>
+          <View style={styles.formField} ref="lastName">
+            <TextInput
+              returnKeyType="next"
+              maxLength={20}
+              ref="lastNameField"
+              onChangeText={(text) => this.setState({lastName: text})}
+              placeholderTextColor='#bbb'
+              style={styles.input}
+              placeholder="Your last name"
+            />
+         </View>
         </ScrollView>
+        <TouchableOpacity style={Globals.submitButton} onPress={()=>{
+          this.props.navigator.push({
+            name: 'RegisterConfirm',
+            email: this.state.email,
+            password: this.state.password,
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            location: this.state.location,
+          })
+        }}>
+          <Text style={Globals.submitButtonText}>Next</Text>
+        </TouchableOpacity>
       </View>
     )
   }

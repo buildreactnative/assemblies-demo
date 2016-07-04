@@ -1,7 +1,7 @@
 import Colors from '../../styles/colors';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { currentUser, FAKE_USERS } from '../../fixtures/fixtures';
+import { currentUser, FAKE_USERS } from '../../fixtures';
 import _ from 'underscore';
 
 import React, { Component } from 'react';

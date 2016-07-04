@@ -15,6 +15,7 @@ import Landing from './application/components/Landing';
 import Dashboard from './application/components/Dashboard';
 import Register from './application/components/accounts/Register';
 import Login from './application/components/accounts/Login';
+import RegisterConfirm from './application/components/accounts/RegisterConfirm';
 
 class assemblies extends Component {
   constructor(){
@@ -50,6 +51,14 @@ class assemblies extends Component {
             return (
               <Login
                 navigator={navigator}
+                updateUser={this.updateUser}
+              />
+            );
+          case 'RegisterConfirm':
+            return (
+              <RegisterConfirm
+                {...route}
+                navigator={navigator} 
                 updateUser={this.updateUser}
               />
             );

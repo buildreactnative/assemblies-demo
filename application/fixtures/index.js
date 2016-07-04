@@ -1,4 +1,4 @@
-const FAKE_USERS = [
+export const FAKE_USERS = [
   { id: 0, firstName: 'Paul', lastName: 'Graham', avatarUrl: 'https://pbs.twimg.com/profile_images/1824002576/pg-railsconf_400x400.jpg' },
   { id: 1, firstName: 'Dan', lastName: 'Abramov', avatarUrl: 'https://pbs.twimg.com/profile_images/553711083064541184/9VsY9i09.jpeg' },
   { id: 2, firstName: 'Marc', lastName: 'Andreessen', avatarUrl: 'https://pbs.twimg.com/profile_images/649108987128868864/rWnwMe55.jpg'},
@@ -7,7 +7,7 @@ const FAKE_USERS = [
   { id: 5, firstName: 'Kanye', lastName: 'West', avatarUrl: 'https://pbs.twimg.com/profile_images/585565077207678977/N_eNSBXi.jpg'},
 ];
 
-const FAKE_MESSAGES = [
+export const FAKE_MESSAGES = [
   'Hello world',
   'How are you?',
   'Yo',
@@ -31,7 +31,7 @@ const FAKE_MESSAGES = [
   "Etsy tousled pop-up, lomo 8-bit craft beer intelligentsia sartorial bespoke hoodie kinfolk.",
 ];
 
-const currentUser = {
+export const currentUser = {
   groupIds: ["b20a1741a2449955"],
   summary: 'React Native enables you to build world-class application experiences on native platforms using a consistent developer experience based on JavaScript and React. The focus of React Native is on developer efficiency across all the platforms you care about — learn once, write anywhere. Facebook uses React Native in multiple production apps and will continue investing in React Native.',
   firstName: 'Example',
@@ -69,13 +69,12 @@ function randomDate(){
   return d2;
 };
 
-let messages = [];
-
-FAKE_USERS.forEach((user) => {
-  let userIds = [currentUser.id, user.id];
+export const messages = FAKE_USERS.map(user => {
+  let userIds = [ currentUser.id, user.id ];
+  let userMessages = [];
   for (let i=0; i<5; i++){
     let sender = Math.random() < 0.5 ? currentUser : user;
-    messages.push({
+    userMessages.push({
       createdAt: randomDate(),
       participants: userIds,
       text: FAKE_MESSAGES[Math.floor(Math.random()*FAKE_MESSAGES.length)],
@@ -84,11 +83,12 @@ FAKE_USERS.forEach((user) => {
       senderId: sender.id
     });
   }
-
+  return userMessages;
 });
 
 
-const upcomingEvent = {
+
+export const upcomingEvent = {
   start: new Date(new Date().valueOf() + 3*24*60*60*1000),
   end: new Date(new Date().valueOf() + 3*27*60*60*1000),
   name: 'React Native NYC Meetup',
@@ -122,7 +122,7 @@ const upcomingEvent = {
   groupId: 1,
 };
 
-const notifications = [
+export const notifications = [
   {time: randomDate().valueOf(), message: 'new message from Kanye', type: 'Message', seen: false,},
   {time: randomDate().valueOf(), message: 'comment in React Native NYC', type: 'Event', seen: false,},
   {time: randomDate().valueOf(), message: 'new members in React Native NYC', type: 'Group', seen: false,},
@@ -131,10 +131,48 @@ const notifications = [
 ]
 
 
-let userGroups = [];
+export const userGroups = [];
 
-let suggestedGroups = [];
+export const suggestedGroups = [];
 
-let events = [];
+export const Technologies = [
+  'JavaScript',
+  'Python',
+  'Java',
+  'Product Management',
+  'Business Development',
+  'Ruby',
+  'Haskell',
+  'Hadoop',
+  'Machine Learning',
+  'Natural Language Processing',
+  'Elm',
+  'Redux',
+  'React Native'
+];
 
-module.exports = { currentUser, notifications, messages, userGroups, suggestedGroups, events, upcomingEvent, FAKE_USERS };
+export const ImageOptions = {
+  title: 'Select Avatar', // specify null or empty string to remove the title
+  cancelButtonTitle: 'Cancel',
+  takePhotoButtonTitle: 'Take Photo...', // specify null or empty string to remove this button
+  chooseFromLibraryButtonTitle: 'Choose from Library...', // specify null or empty string to remove this button
+  cameraType: 'back', // 'front' or 'back'
+  mediaType: 'photo', // 'photo' or 'video'
+  videoQuality: 'high', // 'low', 'medium', or 'high'
+  maxWidth: 200, // photos only
+  maxHeight: 200, // photos only
+  aspectX: 1, // aspectX:aspectY, the cropping image's ratio of width to height
+  aspectY: 1, // aspectX:aspectY, the cropping image's ratio of width to height
+  quality: 1, // photos only
+  angle: 0, // photos only
+  allowsEditing: false, // Built in functionality to resize/reposition the image
+  noData: false, // photos only - disables the base64 `data` field from being generated (greatly improves performance on large photos)
+  storageOptions: { // if this key is provided, the image will get saved in the documents/pictures directory (rather than a temporary directory)
+    skipBackup: true, // image will NOT be backed up to icloud
+    path: 'images' // will save image at /Documents/images rather than the root
+  }
+};
+
+export const DefaultAvatar = 'https://confluence.slac.stanford.edu/s/en_GB/5996/4a6343ec7ed8542179d6c78fa7f87c01f81da016.20/_/images/icons/profilepics/default.png';
+
+export const events = [];

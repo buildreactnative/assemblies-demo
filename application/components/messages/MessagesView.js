@@ -13,7 +13,7 @@ import NavigationBar from 'react-native-navbar';
 import Colors from '../../styles/colors';
 import Conversation from './Conversation';
 
-import { messages } from '../../fixtures/fixtures';
+import { messages } from '../../fixtures';
 
 export default class MessagesView extends Component{
   constructor(props){

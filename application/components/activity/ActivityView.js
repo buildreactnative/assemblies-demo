@@ -2,7 +2,7 @@ import NavigationBar from 'react-native-navbar';
 import Colors from '../../styles/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
-import { notifications, upcomingEvent } from '../../fixtures/fixtures';
+import { notifications, upcomingEvent } from '../../fixtures';
 
 import React, { Component } from 'react';
 import {
