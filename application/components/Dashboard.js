@@ -56,7 +56,7 @@ export default class Dashboard extends Component{
           iconName='ios-chatboxes'
           onPress={() => this.setState({ selectedTab: 'Messages' })}
         >
-          <MessagesView />
+          <MessagesView currentUser={currentUser}/>
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Profile'

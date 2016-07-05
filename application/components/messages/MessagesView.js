@@ -1,73 +1,88 @@
 import React, { Component } from 'react';
-
 import {
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
-  ListView,
-  Image,
+  Navigator,
+  Dimensions
 } from 'react-native';
-
-import NavigationBar from 'react-native-navbar';
-import Colors from '../../styles/colors';
+import Conversations from './Conversations';
 import Conversation from './Conversation';
-
-import { messages } from '../../fixtures';
+import UserProfile from '../profile/UserProfile';
+import { DEV, API } from '../../config';
+import _ from 'underscore';
 
 export default class MessagesView extends Component{
-  constructor(props){
-    super(props);
-    let conversations = {};
-    // store each message under a conversation key
-    messages.forEach(msg => {
-      let key = msg.participants.sort().join('-');
-      if (conversations[key]) { conversations[key].push(msg); }
-      else { conversations[key] = [msg]; }
-    });
-    let dataBlob = Object.keys(conversations).map(key => conversations[key]);
-    // take the first message from each conversation
+  constructor(){
+    super();
     this.state = {
-      dataSource: new ListView.DataSource({
-        rowHasChanged: (r1, r2) => r1 != r2
+      conversations: [],
+      users: [],
+      ready: false,
+    }
+  }
+  componentDidMount(){
+    fetch(`${API}/conversations`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(conversations => {
+      let userIds = _.uniq(_.flatten(conversations.map(d => ([d.user1Id, d.user2Id]))));
+      console.log('USER IDS', userIds);
+      fetch(`${API}/users`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
-      .cloneWithRows(dataBlob)
-    };
+      .then(response => response.json())
+      .then(users => {
+        this.setState({ conversations, users });
+      })
+      .catch(err => { console.log('ERR: ', err)})
+      .done();
+    })
+    .catch(err => { console.log('ERR:', err)})
+    .done();
   }
-  _renderRow(rowData){
-    console.log('ROW DATA', rowData);
+  render(){
+    let { conversations, users } = this.state;
     return (
-      <Conversation conversation={rowData}/>
-    );
-  }
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <NavigationBar
-          title={{ title: 'Messages', tintColor: 'white' }}
-          tintColor={Colors.brandPrimary}
-        />
-        <ListView
-          dataSource={this.state.dataSource}
-          contentInset={{ bottom: 49 }}
-          automaticallyAdjustContentInsets={false}
-          ref='messagesList'
-          renderRow={this._renderRow.bind(this)}
-        />
-      </View>
-    );
+      <Navigator
+        style={styles.container}
+        initialRoute={{
+          name: 'Conversations'
+        }}
+        renderScene={(route, navigator) => {
+          switch(route.name){
+            case 'Conversations':
+              return (
+                <Conversations
+                  {...this.props}
+                  {...route}
+                  conversations={conversations}
+                  users={users}
+                />
+              );
+            case 'Conversation':
+              return (
+                <Conversation conversation={route.conversation} />
+              );
+            case 'Profile':
+              return (
+                <Profile user={route.user} />
+              );
+          }
+        }}
+      />
+    )
   }
 };
 
 let styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  h1: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    padding: 20,
-  },
-});
+    flex: 1
+  }
+})

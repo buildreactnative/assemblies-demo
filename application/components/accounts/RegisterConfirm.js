@@ -15,8 +15,8 @@ import NavigationBar from 'react-native-navbar';
 import _ from 'underscore';
 import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
 import { DEV, API } from '../../config';
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 import LeftButton from './LeftButton';
+const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 let ImagePickerManager = require('NativeModules').ImagePickerManager;
 import Dropdown, {
   Select,

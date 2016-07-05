@@ -27,7 +27,7 @@ export default class ProfileView extends Component{
         <ScrollView style={styles.container}>
           <View style={styles.profileHolder}>
             <TouchableOpacity style={styles.avatarHolder}>
-              <Image source={{uri: currentUser.avatarUrl}} style={styles.avatar}/>
+              <Image source={{uri: currentUser.avatar}} style={styles.avatar}/>
             </TouchableOpacity>
             <View style={styles.userInfoHolder}>
               <Text style={styles.name}>{currentUser.firstName} {currentUser.lastName}</Text>

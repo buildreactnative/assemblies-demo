@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 export const FAKE_USERS = [
   { id: 0, firstName: 'Paul', lastName: 'Graham', avatarUrl: 'https://pbs.twimg.com/profile_images/1824002576/pg-railsconf_400x400.jpg' },
   { id: 1, firstName: 'Dan', lastName: 'Abramov', avatarUrl: 'https://pbs.twimg.com/profile_images/553711083064541184/9VsY9i09.jpeg' },
@@ -69,7 +71,7 @@ function randomDate(){
   return d2;
 };
 
-export const messages = FAKE_USERS.map(user => {
+export const messages = _.flatten(FAKE_USERS.map(user => {
   let userIds = [ currentUser.id, user.id ];
   let userMessages = [];
   for (let i=0; i<5; i++){
@@ -84,7 +86,7 @@ export const messages = FAKE_USERS.map(user => {
     });
   }
   return userMessages;
-});
+}));
 
 
 

@@ -5,10 +5,10 @@ import {
   StyleSheet
 } from 'react-native';
 
-export default class Conversation extends Component{
+export default class UserProfile extends Component{
   render(){
     <View style={styles.container}>
-      <Text>CONVERSATION</Text>
+      <Text>USER PROFILE</Text>
     </View>
   }
 };
