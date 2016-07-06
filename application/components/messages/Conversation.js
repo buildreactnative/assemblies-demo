@@ -7,15 +7,18 @@ import {
 
 export default class Conversation extends Component{
   render(){
-    <View style={styles.container}>
-      <Text>CONVERSATION</Text>
-    </View>
+    return(
+      <View style={styles.container}>
+        <Text>CONVERSATION</Text>
+      </View>
+    )
   }
 };
 
 let styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center'
   }

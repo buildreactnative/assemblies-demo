@@ -21,7 +21,14 @@ export default class MessagesView extends Component{
     }
   }
   componentDidMount(){
-    fetch(`${API}/conversations`, {
+    let { currentUser } = this.props;
+    let conversationQuery = {
+      $or: [
+        {user1Id: currentUser.id},
+        {user2Id: currentUser.id}
+      ]
+    };
+    fetch(`${API}/conversations?${JSON.stringify(conversationQuery)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -31,7 +38,10 @@ export default class MessagesView extends Component{
     .then(conversations => {
       let userIds = _.uniq(_.flatten(conversations.map(d => ([d.user1Id, d.user2Id]))));
       console.log('USER IDS', userIds);
-      fetch(`${API}/users`, {
+      let userQuery = {
+        id: { $in: userIds }
+      }
+      fetch(`${API}/users?${userQuery}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -63,12 +73,17 @@ export default class MessagesView extends Component{
                   {...this.props}
                   {...route}
                   conversations={conversations}
+                  navigator={navigator}
                   users={users}
                 />
               );
             case 'Conversation':
               return (
-                <Conversation conversation={route.conversation} />
+                <Conversation
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
               );
             case 'Profile':
               return (

@@ -18,11 +18,11 @@ let { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 export default class ConversationRow extends Component{
   render(){
-    let { conversation, user } = this.props;
+    let { conversation, user, handlePress } = this.props;
     let msg = conversation.lastMessageText;
     let date = new Date(conversation.lastMessageDate);
     return (
-      <TouchableOpacity style={{ flex: 1 }}>
+      <TouchableOpacity style={{ flex: 1 }} onPress={handlePress}>
         <View style={styles.container}>
           <Image style={styles.profile} source={{uri: user.avatar}}/>
           <View style={styles.fromContainer}>

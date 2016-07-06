@@ -18,12 +18,22 @@ import { messages } from '../../fixtures';
 export default class Conversations extends Component{
   _renderRow(rowData){
     console.log('ROW DATA', rowData);
-    let { users, currentUser } = this.props;
+    let { users, currentUser, navigator } = this.props;
     let otherUserId = rowData.user1Id == currentUser.id ? rowData.user2Id : rowData.user1Id;
     let otherUserIdx = users.map(u => u.id).indexOf(otherUserId);
     let otherUser = users[otherUserIdx];
     return (
-      <ConversationRow conversation={rowData} user={otherUser}/>
+      <ConversationRow
+        conversation={rowData}
+        user={otherUser}
+        handlePress={() => {
+          navigator.push({
+            name: 'Conversation',
+            conversation: rowData,
+            user: otherUser
+          });
+        }}
+      />
     );
   }
   render() {
