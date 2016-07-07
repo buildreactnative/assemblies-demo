@@ -23,34 +23,22 @@ export default class MessagesView extends Component{
   componentDidMount(){
     let { currentUser } = this.props;
     let conversationQuery = {
-      $or: [
-        {user1Id: currentUser.id},
-        {user2Id: currentUser.id}
+      "$or": [
+        {"user1Id": currentUser.id},
+        {"user2Id": currentUser.id}
       ]
     };
-    fetch(`${API}/conversations?${JSON.stringify(conversationQuery)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    fetch(`${API}/conversations?${conversationQuery}`)
     .then(response => response.json())
     .then(conversations => {
       let userIds = _.uniq(_.flatten(conversations.map(d => ([d.user1Id, d.user2Id]))));
       console.log('USER IDS', userIds);
       let userQuery = {
-        id: { $in: userIds }
-      }
-      fetch(`${API}/users?${userQuery}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
+        "id": { "$in": userIds }
+      };
+      fetch(`${API}/users?${userQuery}`)
       .then(response => response.json())
-      .then(users => {
-        this.setState({ conversations, users });
-      })
+      .then(users => this.setState({ conversations, users }))
       .catch(err => { console.log('ERR: ', err)})
       .done();
     })

@@ -59,13 +59,15 @@ class Login extends Component{
           this.props.navigator.push({
             name: 'Dashboard'
           })
-        }).catch(err => {
+        })
+        .catch(err => {
           if (DEV) { console.log('Connection error ', err); }
           this.setState({ errorMsg: 'Connection error.' });
         })
         .done();
       }
-    }).catch(err => {
+    })
+    .catch(err => {
       if (DEV) { console.log('Connection error ', err); }
       this.setState({ errorMsg: 'Connection error.' });
     })
