@@ -47,7 +47,7 @@ export default class Conversation extends Component{
     this.createMessage = this.createMessage.bind(this);
     this.state = {
       msg: '',
-      messages: [{text: 'hello'}]
+      messages: []
     }
   }
   componentDidMount(){
@@ -105,18 +105,13 @@ export default class Conversation extends Component{
     let { user, navigator, currentUser } = this.props;
     let { msg, messages } = this.state;
     let titleConfig = { title: `${user.firstName} ${user.lastName}`, tintColor: 'white' };
+    let navbar = <NavigationBar />
+    console.log('NAVBAR', navbar);
     return(
       <View style={styles.container}>
-        <NavigationBar
-          ref='nav'
-          style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
-          tintColor={Colors.brandPrimary}
-          title={titleConfig}
-          leftButton={<LeftButton navigator={navigator}/>}
-        />
         <InvertibleScrollView
           inverted={true}
-          contentContainerStyle={{paddingTop: 10}}
+          style={styles.scrollView}
           ref="scroll">
           {messages.map((msg, idx) => (
             <Message
@@ -127,7 +122,14 @@ export default class Conversation extends Component{
             />
           ))}
         </InvertibleScrollView>
-
+        <View style={styles.navContainer}>
+          <NavigationBar
+            ref='nav'
+            tintColor={Colors.brandPrimary}
+            title={titleConfig}
+            leftButton={<LeftButton navigator={navigator}/>}
+          />
+        </View>
         <View style={styles.inputBox}>
           <TextInput
             multiline={true}
@@ -157,6 +159,9 @@ let messageStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingVertical: 10,
     backgroundColor: 'white',
+  },
+  scrollView: {
+    marginTop: 50,
   },
   icon: {
     marginTop: 10,
@@ -200,6 +205,13 @@ let messageStyles = StyleSheet.create({
 })
 
 let styles = StyleSheet.create({
+  navContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    left: 0,
+    height: 50,
+  },
   inputBox: {
     marginBottom: 50,
     height: 60,
