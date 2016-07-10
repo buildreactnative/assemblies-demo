@@ -50,6 +50,9 @@ export default class Conversation extends Component{
       messages: [{text: 'hello'}]
     }
   }
+  componentDidMount(){
+    console.log(this.refs.nav)
+  }
   _loadMessages(userId){
     let { user, currentUser } = this.props;
     console.log('USER IDS', user.id, currentUser.id);
@@ -105,6 +108,8 @@ export default class Conversation extends Component{
     return(
       <View style={styles.container}>
         <NavigationBar
+          ref='nav'
+          style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
           tintColor={Colors.brandPrimary}
           title={titleConfig}
           leftButton={<LeftButton navigator={navigator}/>}
@@ -139,7 +144,7 @@ export default class Conversation extends Component{
             <Text style={ msg ? styles.submitButtonText : styles.inactiveButtonText }>Send</Text>
           </TouchableOpacity>
         </View>
-        <KeyboardSpacer topSpacing={-50}/>
+        <KeyboardSpacer topSpacing={-50} ref='space'/>
       </View>
     )
   }
