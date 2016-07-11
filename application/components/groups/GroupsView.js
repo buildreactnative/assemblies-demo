@@ -68,7 +68,7 @@ class GroupsView extends Component{
               );
             case 'CreateGroupConfirm':
               return (
-                <CreateGroupConfirm {...this.props} {...route} />
+                <CreateGroupConfirm {...this.props} {...route} navigator={navigator}/>
               )
           }
         }}
