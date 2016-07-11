@@ -8,11 +8,13 @@ import {
 import Groups from './Groups';
 import CreateGroup from './CreateGroup';
 import CreateGroupConfirm from './CreateGroupConfirm';
+import Group from './Group';
 import { API, DEV } from '../../config';
 
 class GroupsView extends Component{
   constructor(){
     super();
+    this.addGroup = this.addGroup.bind(this);
     this.state = {
       groups: [],
       suggestedGroups: [],
@@ -21,6 +23,9 @@ class GroupsView extends Component{
   }
   componentWillMount(){
     this.loadGroups(this.props.currentUser);
+  }
+  addGroup(group){
+    this.setState({ groups: this.state.groups.concat(group)})
   }
   loadGroups(currentUser){
     /* TODO: load user groups and suggested groups */
@@ -68,7 +73,20 @@ class GroupsView extends Component{
               );
             case 'CreateGroupConfirm':
               return (
-                <CreateGroupConfirm {...this.props} {...route} navigator={navigator}/>
+                <CreateGroupConfirm
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                  addGroup={this.addGroup}
+                />
+              );
+            case 'Group':
+              return (
+                <Group
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
               )
           }
         }}

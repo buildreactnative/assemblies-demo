@@ -41,6 +41,7 @@ const TechnologyList = ({ technologies, handlePress }) => {
 class CreateGroupConfirm extends Component{
   constructor(){
     super();
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.showImagePicker = this.showImagePicker.bind(this);
     this.selectTechnology = this.selectTechnology.bind(this);
@@ -48,11 +49,39 @@ class CreateGroupConfirm extends Component{
     this.state = {
       image: '',
       color: '#3F51B5',
-      technologies: []
+      technologies: [],
+      errorMsg: ''
     }
   }
   getOptions(){
     return this.refs.optionList;
+  }
+  handleSubmit(){
+    let { color, image, technologies } = this.state;
+    let { name, description, location, updateGroups, navigator } = this.props;
+    if (! location ){
+      this.setState({ errorMsg: 'You must provide a location.'})
+    } else if (! name ){
+      this.setState({ errorMsg: 'You must provide a name.'})
+    } else if (! description){
+      this.setState({ errorMsg: 'You must provide a description.'})
+    } else {
+      let group = { color, image, technologies, name, description, location };
+      fetch(`${API}/groups`, {
+        method: 'POST',
+        body: JSON.stringify(group)
+      })
+      .then(response => response.json())
+      .then(group => {
+        updateGroups(group);
+        navigator.push({
+          name: 'Group',
+          group: group
+        })
+      })
+      .catch(err => console.log('ERR:', err))
+      .done();
+    }
   }
   showImagePicker(){
     ImagePickerManager.showImagePicker(ImageOptions, (response) => {
@@ -132,7 +161,7 @@ class CreateGroupConfirm extends Component{
             ))}
           </View>
         </ScrollView>
-        <TouchableOpacity style={[Globals.submitButton, {marginBottom: 50}]}>
+        <TouchableOpacity style={[Globals.submitButton, {marginBottom: 50}]} onPress={this.handleSubmit}>
           <Text style={Globals.submitButtonText}>Create group</Text>
         </TouchableOpacity>
       </View>
