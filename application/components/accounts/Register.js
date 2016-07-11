@@ -243,7 +243,7 @@ let styles = StyleSheet.create({
   },
 });
 
-const autocompleteStyles = StyleSheet.create({
+export const autocompleteStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',

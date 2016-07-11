@@ -6,6 +6,8 @@ import {
   Navigator,
 } from 'react-native';
 import Groups from './Groups';
+import CreateGroup from './CreateGroup';
+import CreateGroupConfirm from './CreateGroupConfirm';
 import { API, DEV } from '../../config';
 
 class GroupsView extends Component{
@@ -58,8 +60,16 @@ class GroupsView extends Component{
           switch(route.name){
             case 'Groups':
               return (
-                <Groups {...route} {...this.props} {...this.state}/>
+                <Groups {...route} {...this.props} {...this.state} navigator={navigator}/>
               );
+            case 'CreateGroup':
+              return (
+                <CreateGroup {...this.props} navigator={navigator}/>
+              );
+            case 'CreateGroupConfirm':
+              return (
+                <CreateGroupConfirm {...this.props} {...route} />
+              )
           }
         }}
       />

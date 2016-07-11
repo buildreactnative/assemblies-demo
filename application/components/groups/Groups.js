@@ -20,10 +20,10 @@ const Loading = () => (
     <ActivityIndicator size='large'/>
   </View>
 )
-const AddGroupBox = ({ addGroup }) => (
+const AddGroupBox = ({ navigator }) => (
   <TouchableOpacity
     onPress={()=> {
-      /* TODO: redirect to create group */
+      navigator.push({ name: 'CreateGroup' })
     }}
     style={styles.groupImage}>
     <View style={[styles.group, {backgroundColor: Colors.inactive,}]} >
@@ -44,10 +44,10 @@ const EmptyGroupBox = () => (
   </View>
 );
 
-const EmptyGroupBoxes = () => (
+const EmptyGroupBoxes = ({ navigator }) => (
   <View style={styles.assemblyBoxContainer}>
     <View style={styles.groupsContainer}>
-      <AddGroupBox />
+      <AddGroupBox navigator={navigator}/>
       <EmptyGroupBox />
     </View>
   </View>
@@ -101,14 +101,16 @@ class Groups extends Component{
   _renderAddButton(){
     return (
       <TouchableOpacity style={styles.navButton} onPress={()=>{
-        /* TODO: redirect to create group */
+        this.props.navigator.push({
+          name: 'CreateGroup'
+        })
       }}>
         <Icon name="add-circle" size={25} color="#ccc" />
       </TouchableOpacity>
     )
   }
   render(){
-    let { groups, suggestedGroups, ready } = this.props;
+    let { groups, suggestedGroups, ready, navigator } = this.props;
     if (! ready ) { return <Loading /> }
     if (groups.length % 2 === 1){
       groups = groups.concat(null);
@@ -125,7 +127,7 @@ class Groups extends Component{
         />
         <ScrollView style={styles.assembliesContainer}>
           <Text style={styles.h2}>Your Assemblies</Text>
-          {groups.length ? <GroupBoxes groups={groups} /> : <EmptyGroupBoxes />}
+          {groups.length ? <GroupBoxes groups={groups} /> : <EmptyGroupBoxes navigator={navigator}/>}
           <Text style={styles.h2}>You Might Like</Text>
           {suggestedGroups.length ? <SuggestedGroupBoxes groups={suggestedGroups} /> : <EmptySuggestedGroupBoxes />}
         </ScrollView>
