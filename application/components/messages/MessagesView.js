@@ -38,12 +38,13 @@ export default class MessagesView extends Component{
       };
       fetch(`${API}/users?${userQuery}`)
       .then(response => response.json())
-      .then(users => this.setState({ conversations, users }))
+      .then(users => this.setState({ conversations, users, ready: true }))
       .catch(err => { console.log('ERR: ', err)})
-      .done();
     })
-    .catch(err => { console.log('ERR:', err)})
-    .done();
+    .catch(err => {
+      console.log('ERR:', err);
+      this.setState({ ready: true })
+    })
   }
   render(){
     let { conversations, users } = this.state;
@@ -59,6 +60,7 @@ export default class MessagesView extends Component{
               return (
                 <Conversations
                   {...this.props}
+                  {...this.state}
                   {...route}
                   conversations={conversations}
                   navigator={navigator}

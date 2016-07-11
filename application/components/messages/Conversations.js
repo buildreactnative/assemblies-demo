@@ -7,6 +7,7 @@ import {
   View,
   ListView,
   Image,
+  ActivityIndicator
 } from 'react-native';
 
 import NavigationBar from 'react-native-navbar';
@@ -14,6 +15,12 @@ import Colors from '../../styles/colors';
 import ConversationRow from './ConversationRow';
 
 import { messages } from '../../fixtures';
+
+const Loading = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size='large'/>
+  </View>
+)
 
 export default class Conversations extends Component{
   _renderRow(rowData){
@@ -37,7 +44,8 @@ export default class Conversations extends Component{
     );
   }
   render() {
-    let { conversations, users } = this.props;
+    let { conversations, users, ready } = this.props;
+    if (! ready ) { return <Loading /> }
     return (
       <View style={{ flex: 1 }}>
         <NavigationBar
@@ -72,4 +80,9 @@ let styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 20,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 });

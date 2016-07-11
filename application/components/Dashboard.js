@@ -14,6 +14,8 @@ import ProfileView from './profile/ProfileView';
 import MessagesView from './messages/MessagesView';
 import ActivityView from './activity/ActivityView';
 import { DEV, API } from '../config';
+import CalendarView from './calendar/CalendarView';
+import GroupsView from './groups/GroupsView';
 
 export default class Dashboard extends Component{
   constructor(props){
@@ -49,6 +51,22 @@ export default class Dashboard extends Component{
           onPress={() => this.setState({ selectedTab: 'Activity' })}
         >
           <ActivityView />
+        </TabBarItemIOS>
+        <TabBarItemIOS
+          title='Groups'
+          selected={ selectedTab == 'Groups' }
+          iconName='ios-people'
+          onPress={() => this.setState({ selectedTab: 'Groups' })}
+        >
+          <GroupsView {...this.props}/>
+        </TabBarItemIOS>
+        <TabBarItemIOS
+          title='Calendar'
+          selected={ selectedTab == 'Calendar' }
+          iconName='ios-calendar'
+          onPress={() => this.setState({ selectedTab: 'Calendar' })}
+        >
+          <CalendarView {...this.props}/>
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Messages'
