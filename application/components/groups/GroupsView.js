@@ -32,7 +32,7 @@ class GroupsView extends Component{
     let query = {
       members: {
         $elemMatch: {
-          user_id: currentUser.id
+          userId: currentUser.id
         }
       }
     };

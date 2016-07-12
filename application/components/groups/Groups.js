@@ -62,18 +62,25 @@ const EmptySuggestedGroupBoxes = () => (
   </View>
 )
 
-const GroupBoxes = ({ groups }) => (
+const GroupBoxes = ({ groups, navigator }) => (
   <View style={{justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap'}}>
     {groups.map((group, idx) => {
       if (!group) { return <EmptyGroupBox key={idx}/>}
       return (
-        <View key={idx} style={styles.groupsContainer}>
+        <TouchableOpacity
+          key={idx}
+          style={styles.groupsContainer}
+          onPress={() => navigator.push({
+            name: 'Group',
+            group
+          })}
+        >
           <Image source={{uri: group.image}} style={styles.groupImage}>
             <View style={[styles.group, {backgroundColor: group.color,}]} >
               <Text style={styles.groupText}>{group.name}</Text>
             </View>
           </Image>
-        </View>
+        </TouchableOpacity>
       )
     })}
   </View>
@@ -127,7 +134,7 @@ class Groups extends Component{
         />
         <ScrollView style={styles.assembliesContainer}>
           <Text style={styles.h2}>Your Assemblies</Text>
-          {groups.length ? <GroupBoxes groups={groups} /> : <EmptyGroupBoxes navigator={navigator}/>}
+          {groups.length ? <GroupBoxes groups={groups} navigator={navigator}/> : <EmptyGroupBoxes navigator={navigator}/>}
           <Text style={styles.h2}>You Might Like</Text>
           {suggestedGroups.length ? <SuggestedGroupBoxes groups={suggestedGroups} /> : <EmptySuggestedGroupBoxes />}
         </ScrollView>

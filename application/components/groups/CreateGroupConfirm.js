@@ -47,7 +47,7 @@ class CreateGroupConfirm extends Component{
     this.selectTechnology = this.selectTechnology.bind(this);
     this.removeTechnology = this.removeTechnology.bind(this);
     this.state = {
-      image: '',
+      image: 'https://s3-us-west-2.amazonaws.com/assembliesapp/welcome%402x.png',
       color: '#3F51B5',
       technologies: [],
       errorMsg: ''
@@ -57,8 +57,9 @@ class CreateGroupConfirm extends Component{
     return this.refs.optionList;
   }
   handleSubmit(){
+    console.log('PROPS', this.props);
     let { color, image, technologies } = this.state;
-    let { name, description, location, updateGroups, navigator } = this.props;
+    let { name, description, location, groupName, addGroup, navigator, currentUser } = this.props;
     if (! location ){
       this.setState({ errorMsg: 'You must provide a location.'})
     } else if (! name ){
@@ -66,14 +67,31 @@ class CreateGroupConfirm extends Component{
     } else if (! description){
       this.setState({ errorMsg: 'You must provide a description.'})
     } else {
-      let group = { color, image, technologies, name, description, location };
+      let group = {
+        color,
+        image,
+        technologies,
+        description,
+        location ,
+        name: groupName,
+        members: [{
+          userId: currentUser.id,
+          role: 'owner',
+          joinedAt: new Date().valueOf(),
+          confirmed: true
+        }],
+        createdAt: new Date().valueOf()
+      };
+      console.log('GROUP PARAMS', group);
       fetch(`${API}/groups`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(group)
       })
       .then(response => response.json())
       .then(group => {
-        updateGroups(group);
+        console.log('GROUP', group);
+        addGroup(group);
         navigator.push({
           name: 'Group',
           group: group
@@ -111,7 +129,7 @@ class CreateGroupConfirm extends Component{
   }
   render(){
     let { navigator } = this.props;
-    let { technologies, image, color } = this.state;
+    let { technologies, image, color, errorMsg } = this.state;
     let titleConfig = {title: 'Create Assembly', tintColor: 'white'}
     return (
       <View style={styles.container}>
@@ -160,6 +178,9 @@ class CreateGroupConfirm extends Component{
               </TouchableOpacity>
             ))}
           </View>
+          <View style={styles.error}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          </View>
         </ScrollView>
         <TouchableOpacity style={[Globals.submitButton, {marginBottom: 50}]} onPress={this.handleSubmit}>
           <Text style={Globals.submitButtonText}>Create group</Text>
@@ -186,6 +207,17 @@ let styles = StyleSheet.create({
     width: (deviceWidth / 4) - 20,
     margin: 10,
     borderWidth: 4,
+  },
+  error: {
+    backgroundColor: Colors.inactive,
+    paddingHorizontal: 15,
+    marginTop: 20
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: 'red',
+    textAlign: 'center'
   },
   avatar: {
     height: 200,

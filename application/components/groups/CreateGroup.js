@@ -34,12 +34,13 @@ class CreateGroup extends Component{
     }
   }
   handleSubmit(){
-    let { name, location, summary } = this.state;
+    let { name, location, summary, description } = this.state;
     this.props.navigator.push({
       name        : 'CreateGroupConfirm',
       groupName   : name,
       location,
-      summary
+      summary,
+      description
     })
   }
   handlePress(data, details){
@@ -107,7 +108,7 @@ class CreateGroup extends Component{
             returnKeyType="next"
             blurOnSubmit={true}
             clearButtonMode='always'
-            onChangeText={(text)=> this.setState({summary: text})}
+            onChangeText={(text)=> this.setState({ description: text })}
             placeholderTextColor='#bbb'
             style={styles.largeInput}
             multiline={true}
