@@ -148,7 +148,11 @@ export default class RegisterConfirm extends Component{
     let titleConfig = {title: 'Confirm Account', tintColor: 'white'};
     return (
       <View style={styles.container}>
-        <NavigationBar title={titleConfig} leftButton={<LeftButton navigator={navigator}/>} tintColor={Colors.brandPrimary}/>
+        <NavigationBar
+          title={titleConfig}
+          leftButton={<LeftButton handlePress={() => navigator.pop()}/>} 
+          tintColor={Colors.brandPrimary}
+        />
         <ScrollView ref="scrollView" style={styles.formContainer}>
           <View style={{ flex: 1 }}>
             <Text style={styles.h4}>{"Select technologies"}</Text>

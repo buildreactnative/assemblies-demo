@@ -56,7 +56,7 @@ class CreateGroup extends Component{
   render(){
     let { navigator } = this.props;
     let titleConfig = {title: 'Create Assembly', tintColor: 'white'}
-    let leftButtonConfig = <LeftButton navigator={navigator}/>
+    let leftButtonConfig = <LeftButton handlePress={() => navigator.pop()}/>
     return (
       <View style={styles.container}>
         <NavigationBar

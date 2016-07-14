@@ -79,7 +79,7 @@ class Login extends Component{
     return (
       <View style={styles.container}>
         <NavigationBar
-          leftButton={<LeftButton navigator={navigator} />}
+          leftButton={<LeftButton handlePress={() => navigator.pop() } />}
           title={{ title: 'Login', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
         />

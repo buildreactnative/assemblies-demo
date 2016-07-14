@@ -86,17 +86,24 @@ const GroupBoxes = ({ groups, navigator }) => (
   </View>
 );
 
-const SuggestedGroupBoxes = ({ groups }) => (
-  <View>
-    {groups.map((group, idx) => (
-      <View key={idx} style={styles.groupsContainer}>
-        <Image source={{uri: group.image}} style={styles.groupImage}>
-          <View style={[styles.group, {backgroundColor: group.color,}]} >
-            <Text style={styles.groupText}>{group.name}</Text>
-          </View>
-        </Image>
-      </View>
-    ))}
+const SuggestedGroupBoxes = ({ groups, navigator }) => (
+  <View style={{justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap'}}>
+    {groups.map((group, idx) => {
+      if (!group) { return <EmptyGroupBox key={idx}/>}
+      return (
+        <TouchableOpacity
+          key={idx}
+          style={styles.groupsContainer}
+          onPress={() => navigator.push({ name: 'Group', group})}
+        >
+          <Image source={{uri: group.image}} style={styles.groupImage}>
+            <View style={[styles.group, {backgroundColor: group.color,}]} >
+              <Text style={styles.groupText}>{group.name}</Text>
+            </View>
+          </Image>
+        </TouchableOpacity>
+      );
+    })}
   </View>
 );
 
@@ -122,6 +129,9 @@ class Groups extends Component{
     if (groups.length % 2 === 1){
       groups = groups.concat(null);
     }
+    if (suggestedGroups.length % 2 === 1){
+      suggestedGroups = suggestedGroups.concat(null)
+    }
     let rightButtonConfig = this._renderAddButton()
     let titleConfig = {title: 'My Groups', tintColor: 'white'}
     return (
@@ -136,7 +146,7 @@ class Groups extends Component{
           <Text style={styles.h2}>Your Assemblies</Text>
           {groups.length ? <GroupBoxes groups={groups} navigator={navigator}/> : <EmptyGroupBoxes navigator={navigator}/>}
           <Text style={styles.h2}>You Might Like</Text>
-          {suggestedGroups.length ? <SuggestedGroupBoxes groups={suggestedGroups} /> : <EmptySuggestedGroupBoxes />}
+          {suggestedGroups.length ? <SuggestedGroupBoxes groups={suggestedGroups} navigator={navigator}/> : <EmptySuggestedGroupBoxes />}
         </ScrollView>
       </View>
     )
@@ -151,7 +161,8 @@ let styles = StyleSheet.create({
   h2: {
     fontSize: 20,
     fontWeight: '400',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
     color: Colors.bodyText,
   },
   group: {

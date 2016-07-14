@@ -37,7 +37,11 @@ class Register extends Component{
     let titleConfig = { title: 'Create Account', tintColor: 'white' };
     return (
       <View style={styles.container}>
-        <NavigationBar title={titleConfig} tintColor={Colors.brandPrimary} leftButton={<LeftButton navigator={navigator}/>} />
+        <NavigationBar
+          title={titleConfig}
+          tintColor={Colors.brandPrimary}
+          leftButton={<LeftButton handlePress={() => navigator.pop()}/>} 
+        />
         <ScrollView style={styles.formContainer}>
           <TouchableOpacity onPress={()=> navigator.push({ name: 'Login' })}>
             <Text style={styles.h5}>

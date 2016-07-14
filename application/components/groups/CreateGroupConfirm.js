@@ -136,7 +136,7 @@ class CreateGroupConfirm extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton navigator={navigator}/>}
+          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
         />
         <ScrollView
           style={styles.formContainer}>

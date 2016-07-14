@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Text,
   Image,
+  ActionSheetIOS,
   StyleSheet
 } from 'react-native';
 
@@ -17,9 +18,27 @@ import { API, DEV } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
+const OptionsButton = ({ openActionSheet }) => {
+  return (
+    <TouchableOpacity style={styles.addButton} onPress={openActionSheet}>
+      <Icon name="ios-more" size={25} color="#ccc" />
+    </TouchableOpacity >
+  )
+}
+const Join = () => (
+  <Icon name='ios-add' size={30} color='white' style={styles.joinIcon} />
+)
+
+const Joined = () => (
+  <View style={styles.joinedContainer}>
+    <Icon name="ios-checkmark" size={30} color='white' style={styles.joinIcon}/>
+  </View>
+)
 class Group extends Component{
   constructor(){
     super();
+    this._renderJoin = this._renderJoin.bind(this);
+    this.openActionSheet = this.openActionSheet.bind(this);
     this.state = {
       users: [],
       ready: false,
@@ -36,15 +55,46 @@ class Group extends Component{
     .catch(err => this.setState({ ready: true }))
     .done();
   }
+  _renderJoin(){
+    let {group, currentUser, addUserToGroup} = this.props;
+    let isMember = group.members.map(m => m.userId).indexOf(currentUser.id) !== -1;
+    return (
+      <View style={styles.joinContainer}>
+        <TouchableOpacity
+          onPress={() => addUserToGroup(group, currentUser)}
+          style={styles.joinButton}>
+          <Text style={styles.joinText}>{ isMember ? 'Joined' : 'Join'}</Text>
+          { isMember ? <Joined /> : <Join /> }
+        </TouchableOpacity>
+      </View>
+    )
+  }
+  openActionSheet(){
+    let { group, currentUser, unsubscribeFromGroup } = this.props;
+    let options = {
+      options: ['Unsubscribe', 'Cancel'],
+      cancelButtonIndex: 1
+    };
+    ActionSheetIOS.showActionSheetWithOptions(options, (buttonIndex) => {
+      switch(buttonIndex){
+        case 0:
+          unsubscribeFromGroup(group, currentUser);
+        default:
+          return;
+      }
+    });
+  }
   render(){
     let { users } = this.state;
     let { group, currentUser, navigator } = this.props;
+    console.log('NAV', navigator);
     return (
       <View style={styles.container}>
         <NavigationBar
           title={{title: group.name, tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton navigator={navigator}/>}
+          leftButton={<LeftButton handlePress={() => navigator.replacePreviousAndPop({name: 'Groups'})}/>}
+          rightButton={<OptionsButton openActionSheet={this.openActionSheet}/>}
         />
         <ScrollView style={styles.scrollView}>
           <Image source={{uri: group.image}} style={styles.topImage}>
@@ -59,8 +109,9 @@ class Group extends Component{
           <Text style={[styles.h4, {paddingHorizontal: 20,}]}>{group.description}</Text>
           <Text style={styles.h2}>Technologies</Text>
           <Text style={styles.h3}>{group.technologies.join(', ')}</Text>
-          { group.members.map(m => m.userId).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
+          { users.map(user => user.id).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
           <Text style={styles.h2}>Events</Text>
+          <View style={styles.break} />
           <Text style={styles.h2}>Members</Text>
           <View style={styles.break} />
           {group.members.map((member, idx) => {
@@ -95,7 +146,7 @@ let styles = StyleSheet.create({
   addButton: {
     backgroundColor: 'transparent',
     paddingRight: 20,
-    paddingBottom: 10,
+    paddingTop: 10
   },
   container: {
     flex: 1,
@@ -177,6 +228,15 @@ let styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 4,
     backgroundColor: Colors.brandPrimary,
+  },
+  joinedContainer: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'white'
   },
   joinText: {
     fontSize: 22,
