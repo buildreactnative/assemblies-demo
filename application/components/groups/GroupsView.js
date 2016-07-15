@@ -100,7 +100,7 @@ class GroupsView extends Component{
     return (
       <Navigator
         style={styles.container}
-        initialRoute={{ name: 'CreateEvent' }}
+        initialRoute={{ name: 'Groups' }}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'Groups':

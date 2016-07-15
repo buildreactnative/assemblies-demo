@@ -106,7 +106,7 @@ export default class Conversation extends Component{
     let { msg, messages } = this.state;
     let titleConfig = { title: `${user.firstName} ${user.lastName}`, tintColor: 'white' };
     let navbar = <NavigationBar />
-    console.log('NAVBAR', navbar);
+    if (DEV) console.log('NAVBAR', navbar);
     return(
       <View style={styles.container}>
         <InvertibleScrollView

@@ -21,6 +21,7 @@ import { autocompleteStyles } from '../accounts/Register';
 import LeftButton from '../accounts/LeftButton';
 import moment from 'moment';
 import Config from 'react-native-config';
+import { API, DEV } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -34,14 +35,39 @@ class CreateEvent extends Component{
       showEndModal: false,
       end: new Date(),
       description: '',
+      finalStart: new Date(),
+      finalEnd: new Date(),
+      errorMsg: ''
     };
   }
   submitForm(){
     /* TODO: submit form */
+    let { finalStart, finalEnd, description } = this.state;
+    let { group, eventName, location, capacity, currentUser, navigator } = this.props;
+    let event = {
+      start: finalStart.valueOf(),
+      end: finalEnd.valueOf(),
+      description,
+      createdAt: new Date().valueOf(),
+      groupId: group.id,
+      name: eventName,
+      location: location || {},
+      capacity,
+      going: [ currentUser.id ]
+    };
+    fetch(`${API}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(event)
+    })
+    .then(response => response.json())
+    .then(data => navigator.push({ name: 'Group', group }))
+    .catch(err => this.setState({ errorMsg: err.reason }))
+    .done();
   }
   render(){
     let { navigator } = this.props;
-    let { start, end, showStartModal, showEndModal, description } = this.state;
+    let { start, end, finalStart, finalEnd, showStartModal, showEndModal, description, errorMsg } = this.state;
     let titleConfig = {title: 'Confirm Event', tintColor: 'white'};
     return (
       <View style={styles.container}>
@@ -54,14 +80,14 @@ class CreateEvent extends Component{
           <Text style={styles.h4}>{"* When does the event start?"}</Text>
           <View style={styles.formField}>
             <TouchableOpacity style={styles.pickerButton} onPress={() => this.setState({ showStartModal: ! showStartModal })}>
-              <Text style={styles.input}>{start ? moment(start).format() : 'Choose a starting time'}</Text>
+              <Text style={styles.input}>{finalStart ? moment(finalStart).format('dddd MMM Do, h:mm a') : 'Choose a starting time'}</Text>
               <Icon name="ios-arrow-forward" color='#777' size={30} style={{marginRight: 15}}/>
             </TouchableOpacity>
           </View>
           <Text style={styles.h4}>* When does the event end?</Text>
           <View style={styles.formField}>
             <TouchableOpacity style={styles.pickerButton} onPress={() => this.setState({ showEndModal: ! showEndModal })}>
-              <Text style={styles.input}>{end ? moment(end).format() : 'Choose an ending time'}</Text>
+              <Text style={styles.input}>{finalEnd ? moment(finalEnd).format('dddd MMM Do, h:mm a') : 'Choose an ending time'}</Text>
               <Icon name="ios-arrow-forward" color='#777' size={30} style={{marginRight: 15}}/>
             </TouchableOpacity>
           </View>
@@ -77,6 +103,9 @@ class CreateEvent extends Component{
             multiline={true}
             placeholder="Type a summary of the event..."
           />
+          <View style={styles.error}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          </View>
         </ScrollView>
         <TouchableOpacity
           onPress={this.submitForm}
@@ -87,22 +116,28 @@ class CreateEvent extends Component{
           animationType={"slide"}
           transparent={true}
           visible={showStartModal}
-          onRequestClose={() => this.setState({ showStartModal: false })}
+          onRequestClose={() => this.setState({ showStartModal: false, finalStart: this.state.start })}
           >
          <View style={styles.modal}>
            <View style={styles.datepicker}>
              <DatePickerIOS
-               date={new Date()}
+               date={this.state.start}
                minimumDate={new Date()}
                minuteInterval={15}
                mode='datetime'
-               onDateChange={(date) => console.log('DATE', date)}
+               onDateChange={(date) => this.setState({ start: date })}
              />
              <View style={styles.btnGroup}>
-               <TouchableOpacity style={styles.pickerBtn} onPress={() => this.setState({ showStartModal: false })}>
+               <TouchableOpacity
+                 style={styles.pickerBtn}
+                 onPress={() => this.setState({ showStartModal: false })}
+                 >
                  <Text style={styles.btnText}>Cancel</Text>
                </TouchableOpacity>
-               <TouchableOpacity style={[styles.pickerBtn, styles.btnPrimary]}>
+               <TouchableOpacity
+                 style={[styles.pickerBtn, styles.btnPrimary]}
+                 onPress={() => this.setState({ showStartModal: false, finalStart: this.state.start })}
+                 >
                  <Text style={[styles.btnText, { color: 'white' }]}>Save</Text>
                </TouchableOpacity>
              </View>
@@ -114,22 +149,28 @@ class CreateEvent extends Component{
           animationType={"slide"}
           transparent={true}
           visible={showEndModal}
-          onRequestClose={() => this.setState({ showEndModal: false })}
+          onRequestClose={() => this.setState({ showEndModal: false, finalEnd: this.state.end })}
           >
          <View style={styles.modal}>
            <View style={styles.datepicker}>
              <DatePickerIOS
-               date={new Date()}
+               date={this.state.end}
                minimumDate={new Date()}
                minuteInterval={15}
                mode='datetime'
-               onDateChange={(date) => console.log('DATE', date)}
+               onDateChange={(date) => this.setState({ end: date })}
              />
              <View style={styles.btnGroup}>
-               <TouchableOpacity style={styles.pickerBtn} onPress={() => this.setState({ showEndModal: false })}>
+               <TouchableOpacity
+                 style={styles.pickerBtn}
+                 onPress={() => this.setState({ showEndModal: false })}
+                 >
                  <Text style={styles.btnText}>Cancel</Text>
                </TouchableOpacity>
-               <TouchableOpacity style={[styles.pickerBtn, styles.btnPrimary]}>
+               <TouchableOpacity
+                 style={[styles.pickerBtn, styles.btnPrimary]}
+                 onPress={() => this.setState({ showEndModal: false, finalEnd: this.state.end })}
+                 >
                  <Text style={[styles.btnText, { color: 'white' }]}>Save</Text>
                </TouchableOpacity>
              </View>
@@ -237,6 +278,15 @@ let styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 20,
     paddingVertical: 5,
+  },
+  error: {
+    backgroundColor: Colors.inactive,
+    paddingHorizontal: 15,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: 'red'
   },
   largeInput: {
     color: '#777',

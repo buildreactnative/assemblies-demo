@@ -14,6 +14,7 @@ import {
 import NavigationBar from 'react-native-navbar';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LeftButton from '../accounts/LeftButton';
+import moment from 'moment';
 import { API, DEV } from '../../config';
 import { find } from 'underscore';
 
@@ -42,18 +43,28 @@ class Group extends Component{
     this.openActionSheet = this.openActionSheet.bind(this);
     this.state = {
       users: [],
+      events: [],
       ready: false,
     }
   }
   componentDidMount(){
     let { group } = this.props;
-    let query = {
-      id: { $in: group.members.map(member => member.userId) }
-    }
-    fetch(`${API}/users?${JSON.stringify(query)}`)
+    let eventsQuery = { groupId: group.id };
+    fetch(`${API}/events?${JSON.stringify(eventsQuery)}`)
     .then(response => response.json())
-    .then(users => this.setState({ users, ready: true }))
+    .then(events => {
+      this.setState({ events, ready: true });
+      let query = {
+        id: { $in: group.members.map(member => member.userId) }
+      }
+      fetch(`${API}/users?${JSON.stringify(query)}`)
+      .then(response => response.json())
+      .then(users => this.setState({ users, ready: true }))
+      .catch(err => { if (DEV) console.log('FETCH USERS ERROR: ', err)})
+      .done();
+    })
     .catch(err => this.setState({ ready: true }))
+    .done();
   }
   _renderJoin(){
     let {group, currentUser, addUserToGroup} = this.props;
@@ -94,9 +105,9 @@ class Group extends Component{
     });
   }
   render(){
-    let { users } = this.state;
+    let { users, events } = this.state;
     let { group, currentUser, navigator } = this.props;
-    console.log('NAV', navigator);
+    if (DEV) console.log('NAV', navigator);
     return (
       <View style={styles.container}>
         <NavigationBar
@@ -120,6 +131,22 @@ class Group extends Component{
           <Text style={styles.h3}>{group.technologies.join(', ')}</Text>
           { users.map(user => user.id).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
           <Text style={styles.h2}>Events</Text>
+          {events.map((event, idx) => {
+            let going = find(event.going, (g) => g === currentUser.id);
+            return (
+              <View style={styles.eventContainer}>
+                <TouchableOpacity style={styles.eventInfo}>
+                  <Text style={styles.h5}>{event.name}</Text>
+                  <Text style={styles.h4}>{moment(event.start).format('dddd, MMM Do')}</Text>
+                  <Text style={styles.h4}>{event.going.length} Going</Text>
+                </TouchableOpacity>
+                <View style={styles.goingContainer}>
+                  <Text style={styles.goingText}>{going ? "You're Going" : "Want to go?"}</Text>
+                  {going ? <Icon name="ios-checkmark" size={30} color={Colors.brandPrimary} /> : <Icon name="ios-add" size={30} color={Colors.brandPrimary} /> }
+                </View>
+              </View>
+            )
+          })}
           <View style={styles.break} />
           <Text style={styles.h2}>Members</Text>
           <View style={styles.break} />
