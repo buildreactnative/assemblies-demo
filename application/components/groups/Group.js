@@ -54,7 +54,6 @@ class Group extends Component{
     .then(response => response.json())
     .then(users => this.setState({ users, ready: true }))
     .catch(err => this.setState({ ready: true }))
-    .done();
   }
   _renderJoin(){
     let {group, currentUser, addUserToGroup} = this.props;
@@ -86,7 +85,7 @@ class Group extends Component{
           unsubscribeFromGroup(group, currentUser);
           break;
         case 'Create Event':
-          navigator.push({ name: 'Create Event', group })
+          navigator.push({ name: 'CreateEvent', group })
           console.log('CREATE EVENT')
           break;
         default:

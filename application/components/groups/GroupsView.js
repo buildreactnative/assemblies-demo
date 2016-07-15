@@ -9,6 +9,7 @@ import Groups from './Groups';
 import CreateGroup from './CreateGroup';
 import CreateGroupConfirm from './CreateGroupConfirm';
 import CreateEvent from './CreateEvent';
+import CreateEventConfirm from './CreateEventConfirm';
 import Group from './Group';
 import { API, DEV } from '../../config';
 
@@ -45,9 +46,8 @@ class GroupsView extends Component{
       body: JSON.stringify(group)
     })
     .then(response => response.json())
-    .then(data => console.log('RES', data))
-    .catch(err => console.log('ERROR', err))
-    .done();
+    .then(data => { if (DEV) console.log('RES', data) })
+    .catch(err => { if (DEV) console.log('ERROR', err) })
   }
   addUserToGroup(group, currentUser){
     let { groups, suggestedGroups } = this.state;
@@ -87,29 +87,37 @@ class GroupsView extends Component{
       fetch(`${API}/groups/?${JSON.stringify(suggestedGroupsQuery)}`)
       .then(response => response.json())
       .then(suggestedGroups => this.setState({ suggestedGroups }))
-      .catch(err => { console.log('ERR:', err)})
+      .catch(err => { if (DEV) console.log('ERR:', err)})
       .done();
     })
     .catch(err => {
-      console.log('ERR:', err);
+      if (DEV)
+        console.log('ERR:', err);
       this.setState({ ready: true });
-    })
-    .done();
+    });
   }
   render(){
     return (
       <Navigator
         style={styles.container}
-        initialRoute={{ name: 'Groups' }}
+        initialRoute={{ name: 'CreateEvent' }}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'Groups':
               return (
-                <Groups {...route} {...this.props} {...this.state} navigator={navigator}/>
+                <Groups
+                  {...route}
+                  {...this.props}
+                  {...this.state}
+                  navigator={navigator}
+                />
               );
             case 'CreateGroup':
               return (
-                <CreateGroup {...this.props} navigator={navigator}/>
+                <CreateGroup
+                  {...this.props}
+                  navigator={navigator}
+                />
               );
             case 'CreateGroupConfirm':
               return (
@@ -130,14 +138,22 @@ class GroupsView extends Component{
                   addUserToGroup={this.addUserToGroup}
                 />
               );
-            case 'Create Event':
+            case 'CreateEvent':
               return (
                 <CreateEvent
                   {...this.props}
                   {...route}
                   navigator={navigator}
                 />
-              )
+              );
+            case 'CreateEventConfirm':
+              return (
+                <CreateEventConfirm
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
+              );
           }
         }}
       />

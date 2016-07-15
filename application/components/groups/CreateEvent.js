@@ -5,16 +5,17 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Picker,
+  Slider,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import Picker from 'react-native-picker';
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { extend, find } from 'underscore';
+import { extend, find, range } from 'underscore';
 import { autocompleteStyles } from '../accounts/Register';
 import LeftButton from '../accounts/LeftButton';
 import Config from 'react-native-config';
@@ -30,10 +31,19 @@ class CreateEvent extends Component{
       location: null,
       name: '',
       capacity: 50,
+      showPicker: false,
     };
   }
   submitForm(){
-    /* TODO: save form and continue with form */
+    let { location, name, capacity } = this.state;
+    let { navigator, group } = this.props;
+    navigator.push({
+      name: 'CreateEventConfirm',
+      group,
+      location,
+      capacity,
+      eventName: name
+    })
   }
   saveLocation(data, details=null){
     this.setState({
@@ -47,6 +57,7 @@ class CreateEvent extends Component{
   }
   render(){
     let { navigator } = this.props;
+    let { capacity, showPicker } = this.state;
     let titleConfig = {title: 'Create Event', tintColor: 'white'};
     return (
       <View style={styles.container}>
@@ -88,18 +99,20 @@ class CreateEvent extends Component{
             filterReverseGeocodingByTypes={['locality', 'adminstrative_area_level_3']}
             predefinedPlaces={[]}
           />
-          <Picker
-            style={{ width: deviceWidth }}
-            selectedValue="key0"
-            mode="dropdown">
-            <Picker.Item label="hello" value="key0" />
-            <Picker.Item label="world" value="key1" />
-            <Picker.Item label="hey" value="key2" />
-            <Picker.Item label="yo" value="key3" />
-            <Picker.Item label="what" value="key4" />
-            <Picker.Item label="wtf" value="key5" />
-          </Picker>
-
+          <Text style={styles.h4}>Attendee capacity</Text>
+          <View style={styles.formField}>
+            <View style={styles.pickerButton}>
+              <Text style={styles.input}>{capacity ? capacity : 'Choose a duration'}</Text>
+            </View>
+          </View>
+          <Slider
+            style={styles.slider}
+            defaultValue={capacity}
+            step={10}
+            minimumValue={10}
+            maximumValue={200}
+            onValueChange={(val) => this.setState({capacity: val})}
+          />
         </ScrollView>
         <TouchableOpacity
           onPress={this.submitForm}
@@ -114,6 +127,16 @@ class CreateEvent extends Component{
 let styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  slider: {
+    marginHorizontal: 20,
+    marginVertical: 15,
+  },
+  pickerButton: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   backButton: {
     paddingLeft: 20,
