@@ -8,6 +8,7 @@ import {
 import Groups from './Groups';
 import CreateGroup from './CreateGroup';
 import CreateGroupConfirm from './CreateGroupConfirm';
+import CreateEvent from './CreateEvent';
 import Group from './Group';
 import { API, DEV } from '../../config';
 
@@ -127,6 +128,14 @@ class GroupsView extends Component{
                   navigator={navigator}
                   unsubscribeFromGroup={this.unsubscribeFromGroup}
                   addUserToGroup={this.addUserToGroup}
+                />
+              );
+            case 'Create Event':
+              return (
+                <CreateEvent
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
                 />
               )
           }

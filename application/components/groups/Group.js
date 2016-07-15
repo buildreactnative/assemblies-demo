@@ -15,6 +15,7 @@ import NavigationBar from 'react-native-navbar';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LeftButton from '../accounts/LeftButton';
 import { API, DEV } from '../../config';
+import { find } from 'underscore';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -70,15 +71,24 @@ class Group extends Component{
     )
   }
   openActionSheet(){
-    let { group, currentUser, unsubscribeFromGroup } = this.props;
+    let { group, currentUser, unsubscribeFromGroup, navigator } = this.props;
+    let user = find(group.members, (member) => member.userId === currentUser.id);
+    let buttonActions = ['Unsubscribe', 'Cancel'];
+    if (user && user.role === 'admin' || user.role === 'owner')
+      buttonActions.unshift('Create Event');
     let options = {
-      options: ['Unsubscribe', 'Cancel'],
-      cancelButtonIndex: 1
+      options: buttonActions,
+      cancelButtonIndex: buttonActions.length-1
     };
     ActionSheetIOS.showActionSheetWithOptions(options, (buttonIndex) => {
-      switch(buttonIndex){
-        case 0:
+      switch(buttonActions[buttonIndex]){
+        case 'Unsubscribe':
           unsubscribeFromGroup(group, currentUser);
+          break;
+        case 'Create Event':
+          navigator.push({ name: 'Create Event', group })
+          console.log('CREATE EVENT')
+          break;
         default:
           return;
       }
@@ -116,7 +126,7 @@ class Group extends Component{
           <View style={styles.break} />
           {group.members.map((member, idx) => {
             if (DEV) {console.log('MEMBER', member)}
-            let user = users[users.map(u => u.id).indexOf(member.userId)];
+            let user = find(users, (u => u.id === member.userId))
             let isOwner = member.role === 'owner';
             let isAdmin = member.role === 'admin';
             let status = isOwner ? 'owner' : isAdmin ? 'admin' : 'member'
