@@ -1,6 +1,11 @@
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/Ionicons';
+import NavigationBar from 'react-native-navbar';
+import Swipeout from '../3rd_party/react-native-swipeout';
 import React, { Component } from 'react';
 import {
   View,
+  ListView,
   ScrollView,
   Dimensions,
   TouchableOpacity,
@@ -10,13 +15,10 @@ import {
   ActionSheetIOS,
   StyleSheet
 } from 'react-native';
-
-import NavigationBar from 'react-native-navbar';
-import Icon from 'react-native-vector-icons/Ionicons';
-import LeftButton from '../accounts/LeftButton';
-import moment from 'moment';
-import { API, DEV } from '../../config';
 import { find } from 'underscore';
+
+import LeftButton from '../accounts/LeftButton';
+import { API, DEV } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -24,7 +26,7 @@ const OptionsButton = ({ openActionSheet }) => {
   return (
     <TouchableOpacity style={styles.addButton} onPress={openActionSheet}>
       <Icon name="ios-more" size={25} color="#ccc" />
-    </TouchableOpacity >
+    </TouchableOpacity>
   )
 }
 const Join = () => (
@@ -35,17 +37,108 @@ const Joined = () => (
   <View style={styles.joinedContainer}>
     <Icon name="ios-checkmark" size={30} color='white' style={styles.joinIcon}/>
   </View>
-)
+);
+
+class EventList extends Component{
+  constructor(){
+    super();
+    this._renderRow = this._renderRow.bind(this);
+  }
+  _renderRow(event, sectionID, rowID){
+    let { currentUser, cancelRSVP, joinEvent, events, navigator, group } = this.props;
+    let going = find(event.going, (g) => g === currentUser.id);
+    let right = [{
+      text: 'RSVP',
+      type: 'primary',
+      onPress: () => { joinEvent(event, currentUser) }
+    }];
+    if (going) {
+      right = [{
+        text: 'Cancel',
+        type: 'delete',
+        onPress: () => { cancelRSVP(event, currentUser) }
+      }];
+    }
+    return (
+      <Swipeout
+        backgroundColor='white'
+        rowID={rowID}
+        right={right}
+      >
+        <View style={styles.eventContainer}>
+          <TouchableOpacity style={styles.eventInfo} onPress={() => navigator.push({ name: 'Event', event, group })}>
+            <Text style={styles.h5}>{event.name}</Text>
+            <Text style={styles.h4}>{moment(event.start).format('dddd, MMM Do')}</Text>
+            <Text style={styles.h4}>{event.going.length} Going</Text>
+          </TouchableOpacity>
+          <View style={styles.goingContainer}>
+            <Text style={styles.goingText}>{going ? "You're Going" : "Want to go?"}</Text>
+            {going ? <Icon name="ios-checkmark" size={30} color={Colors.brandPrimary} /> : <Icon name="ios-add" size={30} color={Colors.brandPrimary} /> }
+          </View>
+        </View>
+      </Swipeout>
+    )
+  }
+  render(){
+    let { events } = this.props
+    return (
+      <ListView
+        enableEmptySections={true}
+        dataSource={new ListView.DataSource({rowHasChanged: (r1, r2) => r1 != r2 }).cloneWithRows(events)}
+        renderRow={this._renderRow.bind(this)}
+        style={styles.listview}
+      />
+    )
+  }
+};
+
 class Group extends Component{
   constructor(){
     super();
     this._renderJoin = this._renderJoin.bind(this);
     this.openActionSheet = this.openActionSheet.bind(this);
+    this.cancelRSVP = this.cancelRSVP.bind(this);
+    this.joinEvent = this.joinEvent.bind(this);
     this.state = {
       users: [],
       events: [],
       ready: false,
     }
+  }
+  cancelRSVP(event, currentUser){
+    console.log('CANCEL RSVP', event, currentUser);
+    let { events } = this.state;
+    event.going = event.going.filter(userId => userId !== currentUser.id);
+    let idx = events.map(evt => evt.id).indexOf(event.id);
+    this.setState({ events: [
+      ...events.slice(0, idx),
+      event,
+      ...events.slice(idx + 1)
+    ]});
+    this.updateEventGoing(event);
+  }
+  updateEventGoing(event){
+    fetch(`${API}/events/${event.id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ going: event.going })
+    })
+    .then(response => response.json())
+    .then(data => console.log('RESPONSE', data))
+    .catch(err => console.log('ERROR', err))
+    .done();
+  }
+  joinEvent(event, currentUser){
+    console.log('JOIN RSVP', event, currentUser);
+    let { events } = this.state;
+    event.going = event.going.concat(currentUser.id);
+    let idx = events.map(evt => evt.id).indexOf(event.id);
+    this.setState({ events: [
+      ...events.slice(0, idx),
+      event,
+      ...events.slice(idx + 1)
+    ]});
+    this.updateEventGoing(event);
   }
   componentDidMount(){
     let { group } = this.props;
@@ -129,24 +222,14 @@ class Group extends Component{
           <Text style={[styles.h4, {paddingHorizontal: 20,}]}>{group.description}</Text>
           <Text style={styles.h2}>Technologies</Text>
           <Text style={styles.h3}>{group.technologies.join(', ')}</Text>
-          { users.map(user => user.id).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
+          { group.members.map(m => m.userId).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
           <Text style={styles.h2}>Events</Text>
-          {events.map((event, idx) => {
-            let going = find(event.going, (g) => g === currentUser.id);
-            return (
-              <View style={styles.eventContainer}>
-                <TouchableOpacity style={styles.eventInfo}>
-                  <Text style={styles.h5}>{event.name}</Text>
-                  <Text style={styles.h4}>{moment(event.start).format('dddd, MMM Do')}</Text>
-                  <Text style={styles.h4}>{event.going.length} Going</Text>
-                </TouchableOpacity>
-                <View style={styles.goingContainer}>
-                  <Text style={styles.goingText}>{going ? "You're Going" : "Want to go?"}</Text>
-                  {going ? <Icon name="ios-checkmark" size={30} color={Colors.brandPrimary} /> : <Icon name="ios-add" size={30} color={Colors.brandPrimary} /> }
-                </View>
-              </View>
-            )
-          })}
+          <EventList
+            {...this.state}
+            {...this.props}
+            joinEvent={this.joinEvent}
+            cancelRSVP={this.cancelRSVP}
+          />
           <View style={styles.break} />
           <Text style={styles.h2}>Members</Text>
           <View style={styles.break} />
@@ -222,6 +305,9 @@ let styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '400',
   },
+  listview: {
+    flex: 1,
+  },
   h4: {
     fontSize: 16,
     fontWeight: '300',
@@ -256,6 +342,7 @@ let styles = StyleSheet.create({
   joinContainer: {
     flex: 1,
     paddingHorizontal: 20,
+    height: 50,
   },
   joinButton: {
     flex: 1,

@@ -5,12 +5,14 @@ import {
   StyleSheet,
   Navigator,
 } from 'react-native';
-import Groups from './Groups';
-import CreateGroup from './CreateGroup';
-import CreateGroupConfirm from './CreateGroupConfirm';
+
 import CreateEvent from './CreateEvent';
 import CreateEventConfirm from './CreateEventConfirm';
+import CreateGroup from './CreateGroup';
+import CreateGroupConfirm from './CreateGroupConfirm';
+import Event from './Event';
 import Group from './Group';
+import Groups from './Groups';
 import { API, DEV } from '../../config';
 
 class GroupsView extends Component{
@@ -128,6 +130,14 @@ class GroupsView extends Component{
                   addGroup={this.addGroup}
                 />
               );
+            case 'Event':
+              return (
+                <Event
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
+            );
             case 'Group':
               return (
                 <Group
