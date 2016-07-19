@@ -1,14 +1,8 @@
-import React, { Component } from 'react';
+import _ from 'underscore';
+import Config from 'react-native-config';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
-import Colors from '../../styles/colors';
-import Globals from '../../styles/globals';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import LeftButton from '../accounts/LeftButton';
-import Config from 'react-native-config';
-import _ from 'underscore';
-import { autocompleteStyles } from '../accounts/Register';
-
+import React, { Component } from 'react';
 import {
   ScrollView,
   View,
@@ -18,6 +12,12 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+
+import Colors from '../../styles/colors';
+import Globals from '../../styles/globals';
+import LeftButton from '../accounts/LeftButton';
+import { autocompleteStyles } from '../accounts/Register';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 

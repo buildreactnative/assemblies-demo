@@ -1,5 +1,6 @@
 export default Colors = {
   brandPrimary: '#3A7BD2',
+  brandPrimaryDark: '#215191',
   inactive: '#EBEEF5',
   highlight: '#FFFF8D',
   red: '#C62828',

@@ -1,3 +1,11 @@
+import _ from 'underscore';
+import Icon from 'react-native-vector-icons/Ionicons';
+import NavigationBar from 'react-native-navbar';
+import Dropdown, {
+  Select,
+  Option,
+  OptionList
+} from 'react-native-selectme';
 import React, { Component } from 'react';
 import {
   View,
@@ -10,22 +18,17 @@ import {
   StyleSheet,
   ActivityIndicator
 } from 'react-native';
-import _ from 'underscore';
-import Icon from 'react-native-vector-icons/Ionicons';
-import LeftButton from '../accounts/LeftButton';
-import NavigationBar from 'react-native-navbar';
+
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
-import Dropdown, {
-  Select,
-  Option,
-  OptionList
-} from 'react-native-selectme';
+import LeftButton from '../accounts/LeftButton';
 import { API, DEV } from '../../config';
+import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
+
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
-let ImagePickerManager = require('NativeModules').ImagePickerManager;
+const ImagePickerManager = require('NativeModules').ImagePickerManager;
 const SolidColors = ['red','deepPurple','indigo','teal','orange','blueGrey','purple','green'];
+
 const TechnologyList = ({ technologies, handlePress }) => {
   return (
     <View style={styles.techOuterContainer}>

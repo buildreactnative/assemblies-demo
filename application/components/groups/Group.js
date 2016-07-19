@@ -43,6 +43,15 @@ class EventList extends Component{
   constructor(){
     super();
     this._renderRow = this._renderRow.bind(this);
+    this.visitEvent = this.visitEvent.bind(this);
+  }
+  visitEvent(event){
+    let { navigator, updateEvents, group } = this.props;
+    navigator.push({
+      name: 'Event',
+      event,
+      group,
+     })
   }
   _renderRow(event, sectionID, rowID){
     let { currentUser, cancelRSVP, joinEvent, events, navigator, group } = this.props;
@@ -66,7 +75,7 @@ class EventList extends Component{
         right={right}
       >
         <View style={styles.eventContainer}>
-          <TouchableOpacity style={styles.eventInfo} onPress={() => navigator.push({ name: 'Event', event, group })}>
+          <TouchableOpacity style={styles.eventInfo} onPress={() => this.visitEvent(event)}>
             <Text style={styles.h5}>{event.name}</Text>
             <Text style={styles.h4}>{moment(event.start).format('dddd, MMM Do')}</Text>
             <Text style={styles.h4}>{event.going.length} Going</Text>

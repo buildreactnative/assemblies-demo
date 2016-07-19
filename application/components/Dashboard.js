@@ -21,9 +21,20 @@ export default class Dashboard extends Component{
   constructor(props){
     super(props);
     this.logout = this.logout.bind(this);
+    this.updateTab = this.updateTab.bind(this);
     this.state = {
       selectedTab: 'Activity',
     };
+  }
+  updateTab(type){
+    switch(type){
+      case 'Message':
+        this.setState({ selectedTab: 'Messages'});
+        break;
+      case 'Event':
+        this.setState({ selectedTab: 'Groups'});
+        break;
+    }
   }
   logout(){
     fetch(`${API}/users/logout`, {
@@ -50,7 +61,7 @@ export default class Dashboard extends Component{
           iconName='ios-pulse'
           onPress={() => this.setState({ selectedTab: 'Activity' })}
         >
-          <ActivityView />
+          <ActivityView {...this.props} updateTab={this.updateTab}/>
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Groups'

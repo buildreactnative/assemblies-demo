@@ -1,3 +1,7 @@
+import moment from 'moment';
+import InvertibleScrollView from 'react-native-invertible-scroll-view';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
 import {
   View,
@@ -8,13 +12,10 @@ import {
   TextInput,
   Dimensions
 } from 'react-native';
-import Globals from '../../styles/globals';
+
 import Colors from '../../styles/colors';
-import NavigationBar from 'react-native-navbar';
+import Globals from '../../styles/globals';
 import LeftButton from '../accounts/LeftButton';
-import InvertibleScrollView from 'react-native-invertible-scroll-view';
-import moment from 'moment';
-import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { DEV, API } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -49,9 +50,6 @@ export default class Conversation extends Component{
       msg: '',
       messages: []
     }
-  }
-  componentDidMount(){
-    console.log(this.refs.nav)
   }
   _loadMessages(userId){
     let { user, currentUser } = this.props;
@@ -97,7 +95,10 @@ export default class Conversation extends Component{
       })
     })
     .then(response => response.json())
-    .then(data => this.setState({ msg: '', messages: [ data, ...this.state.messages ]}))
+    .then(data => {
+      console.log('DATA', data);
+      this.setState({ msg: '', messages: [ data, ...this.state.messages ]})
+    })
     .catch(err => console.log('ERR:', err))
     .done();
   }
@@ -105,8 +106,6 @@ export default class Conversation extends Component{
     let { user, navigator, currentUser } = this.props;
     let { msg, messages } = this.state;
     let titleConfig = { title: `${user.firstName} ${user.lastName}`, tintColor: 'white' };
-    let navbar = <NavigationBar />
-    if (DEV) console.log('NAVBAR', navbar);
     return(
       <View style={styles.container}>
         <InvertibleScrollView
@@ -127,7 +126,7 @@ export default class Conversation extends Component{
             ref='nav'
             tintColor={Colors.brandPrimary}
             title={titleConfig}
-            leftButton={<LeftButton navigator={navigator}/>}
+            leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
           />
         </View>
         <View style={styles.inputBox}>
