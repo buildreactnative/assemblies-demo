@@ -12,7 +12,8 @@ class CalendarView extends Component{
   constructor(){
     super();
     this.state = {
-      events: []
+      events: [],
+      ready: false,
     }
   }
   componentDidMount(){
@@ -30,14 +31,20 @@ class CalendarView extends Component{
       let eventsQuery = {
         $or: [
           { groupId: { $in: groups.map(g => g.id) }, start: { $gt: new Date().valueOf() } },
-          { $elemMatch: { going: currentUser.id }, start: { $gt: new Date().valueOf() } },
+          {  going: { $elemMatch: { $eq: currentUser.id }}, start: { $gt: new Date().valueOf() } },
           { 'location.city.long_name': currentUser.location.city.long_name, start: { $gt: new Date().valueOf() } }
         ]
       }
       fetch(`${API}/events?${JSON.stringify(eventsQuery)}`)
       .then(response => response.json())
-      .then(events => this.setState({ events }))
-      .catch(err => console.log('FETCH EVENTS ERROR: ', err))
+      .then(events => {
+        console.log('EVENTS', events);
+        this.setState({ events, ready: true })
+      })
+      .catch(err => {
+        console.log('FETCH EVENTS ERROR: ', err)
+        this.setState({ ready: true })
+      })
       .done()
     })
     .catch(err => console.log('FETCH GROUPS ERROR: ', err))

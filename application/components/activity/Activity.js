@@ -19,7 +19,7 @@ import {
 
 let { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
-export default class ActivityView extends Component{
+export default class Activity extends Component{
   constructor(){
     super();
     this.renderEvent = this.renderEvent.bind(this);

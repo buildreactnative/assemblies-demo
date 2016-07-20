@@ -1,3 +1,5 @@
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
 import {
   Text,
@@ -7,11 +9,11 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import Globals from '../../styles/globals';
+
 import Colors from '../../styles/colors';
-import NavigationBar from 'react-native-navbar';
-import { DEV, API } from '../../config';
+import Globals from '../../styles/globals';
 import LeftButton from './LeftButton';
+import { DEV, API } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 

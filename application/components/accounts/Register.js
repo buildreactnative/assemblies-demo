@@ -1,3 +1,8 @@
+import _ from 'underscore';
+import Config from 'react-native-config';
+import Icon from 'react-native-vector-icons/Ionicons';
+import NavigationBar from 'react-native-navbar';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 import React, { Component } from 'react';
 import {
   Text,
@@ -8,17 +13,14 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import NavigationBar from 'react-native-navbar';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import _ from 'underscore';
+import LeftButton from './LeftButton';
 import {DEV} from '../../config';
-import Config from 'react-native-config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
-import LeftButton from './LeftButton';
 
 
 class Register extends Component{
@@ -40,7 +42,7 @@ class Register extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>} 
+          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
         />
         <ScrollView style={styles.formContainer}>
           <TouchableOpacity onPress={()=> navigator.push({ name: 'Login' })}>
@@ -83,6 +85,7 @@ class Register extends Component{
               predefinedPlaces={[]}>
             </GooglePlacesAutocomplete>
           </View>
+
           <Text style={styles.h4}>* Email</Text>
 
           <View ref="email" style={styles.formField}>

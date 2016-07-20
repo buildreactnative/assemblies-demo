@@ -151,7 +151,7 @@ class Group extends Component{
   }
   componentDidMount(){
     let { group } = this.props;
-    let eventsQuery = { groupId: group.id };
+    let eventsQuery = { groupId: group.id, start: { $gt: new Date().valueOf() } };
     fetch(`${API}/events?${JSON.stringify(eventsQuery)}`)
     .then(response => response.json())
     .then(events => {
