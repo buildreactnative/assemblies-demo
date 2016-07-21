@@ -2,7 +2,7 @@ import _ from 'underscore';
 import Config from 'react-native-config';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
-import KeyboardSpacer from 'react-native-keyboard-spacer';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import React, { Component } from 'react';
 import {
   Text,
@@ -44,7 +44,7 @@ class Register extends Component{
           tintColor={Colors.brandPrimary}
           leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
         />
-        <ScrollView style={styles.formContainer}>
+        <KeyboardAwareScrollView style={styles.formContainer}>
           <TouchableOpacity onPress={()=> navigator.push({ name: 'Login' })}>
             <Text style={styles.h5}>
               Already have an account? <Text style={styles.technologyList}>Login</Text>
@@ -143,7 +143,7 @@ class Register extends Component{
               placeholder="Your last name"
             />
          </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <TouchableOpacity style={Globals.submitButton} onPress={()=>{
           this.props.navigator.push({
             name: 'RegisterConfirm',
