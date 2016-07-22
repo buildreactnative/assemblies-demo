@@ -52,7 +52,7 @@ export default class Dashboard extends Component{
   }
   render() {
     let { selectedTab } = this.state;
-    let { currentUser } = this.props;
+    let { currentUser, updateUser } = this.props;
     return (
       <TabBarIOS style={styles.outerContainer}>
         <TabBarItemIOS
@@ -93,7 +93,7 @@ export default class Dashboard extends Component{
           iconName='ios-person'
           onPress={() => this.setState({ selectedTab: 'Profile' })}
         >
-          <ProfileView currentUser={currentUser} logout={this.logout}/>
+          <ProfileView currentUser={currentUser} logout={this.logout} updateUser={updateUser}/>
         </TabBarItemIOS>
       </TabBarIOS>
     );

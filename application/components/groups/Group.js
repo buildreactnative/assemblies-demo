@@ -250,7 +250,12 @@ class Group extends Component{
             let status = isOwner ? 'owner' : isAdmin ? 'admin' : 'member'
             if ( ! user ) { return; }
             return (
-              <TouchableOpacity key={idx} style={styles.memberContainer}>
+              <TouchableOpacity key={idx} style={styles.memberContainer} onPress={() => {
+                  this.props.navigator.push({
+                    name: 'Profile',
+                    user: user
+                  })
+                }}>
                 <Image source={{uri: user.avatar}} style={styles.avatar}/>
                 <View style={styles.memberInfo}>
                   <Text style={styles.h5}>{user.firstName} {user.lastName}</Text>

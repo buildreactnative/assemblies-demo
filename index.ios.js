@@ -9,6 +9,7 @@ import {
   AppRegistry,
   Navigator,
   StyleSheet,
+  AsyncStorage
 } from 'react-native';
 
 import Landing from './application/components/Landing';
@@ -16,67 +17,61 @@ import Dashboard from './application/components/Dashboard';
 import Register from './application/components/accounts/Register';
 import Login from './application/components/accounts/Login';
 import RegisterConfirm from './application/components/accounts/RegisterConfirm';
-// const FAKE_USER = {
-//   avatar: 'https://confluence.slac.stanford.edu/s/en_GB/5996/4a6343ec7ed8542179d6c78fa7f87c01f81da016.20/_/images/icons/profilepics/default.png',
-//   technologies: [
-//   	"JavaScript",
-//   	"Machine Learning",
-//   	"React Native",
-//   	"Redux"
-//   ],
-//   id: '15f9d0d11a023b8a',
-//   username: 'tom@example.com',
-//   password: 'password',
-//   firstName: 'Tom',
-//   lastName: 'Goldenberg',
-//   location : {
-//   	lat: 41.308274,
-//   	lng: -72.9278835,
-//   	city: {
-//   		long_name: "New Haven",
-//   		short_name: "New Haven",
-//   		types: [
-//   			"locality",
-//   			"political"
-//   		]
-//   	},
-//   	state: {
-//   		long_name: "Connecticut",
-//   		short_name: "CT",
-//   		types: [
-//   			"administrative_area_level_1",
-//   			"political"
-//   		]
-//   	},
-//   	county: {
-//   		long_name: "New Haven County",
-//   		short_name: "New Haven County",
-//   		types: [
-//   			"administrative_area_level_2",
-//   			"political"
-//   		]
-//   	},
-//   	formattedAddress: "New Haven, CT, USA"
-//   }
-// }
+import Loading from './application/components/utilities/Loading';
+import { API, DEV } from './application/config';
 
 class assemblies extends Component {
   constructor(){
     super();
     this.updateUser = this.updateUser.bind(this);
     this.state = {
-      user: null
+      user: null,
+      ready: false,
+      initialRoute: 'Landing'
     }
+  }
+  async _loadLoginCredentials(){
+    try {
+      let sid = await AsyncStorage.getItem('sid');
+      if (sid){
+        fetch(`${API}/users/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Set-Cookie': `sid=${sid}`
+          }
+        })
+        .then(response => response.json())
+        .then(data => { this.setState({ user: data, ready: true, initialRoute: 'Dashboard' }) })
+        .catch(err => {
+          if (DEV) { console.log('Connection error ', err); }
+          this.setState({ ready: true })
+        })
+        .done();
+      } else {
+        this.setState({ ready: true })
+      }
+    } catch (err) {
+      this.setState({ ready: true })
+    }
+  }
+  componentDidMount(){
+    this._loadLoginCredentials();
   }
   updateUser(user){
     this.setState({ user: user });
+    if (!user){
+      this.nav.push({ name: 'Landing' })
+    }
   }
   render() {
-    let { user } = this.state;
+    let { user, ready, initialRoute } = this.state;
+    if (! ready ) { return <Loading /> }
     return (
       <Navigator
-      initialRoute={{name: 'Landing', index: 0}}
-      renderScene={(route, navigator) => {
+        ref={(el) => {this.nav = el}}
+        initialRoute={{name: initialRoute, index: 0}}
+        renderScene={(route, navigator) => {
         switch(route.name){
           case 'Landing':
             return <Landing navigator={navigator} />
@@ -86,6 +81,7 @@ class assemblies extends Component {
               <Dashboard
                 navigator={navigator}
                 currentUser={user}
+                updateUser={this.updateUser}
               />
             );
           case 'Register':
@@ -105,7 +101,6 @@ class assemblies extends Component {
                 updateUser={this.updateUser}
               />
             );
-            break;
           }
         }}
         configureScene={() => Navigator.SceneConfigs.PushFromRight}

@@ -6,6 +6,7 @@ import {
   Navigator,
 } from 'react-native';
 
+import Conversation from '../messages/Conversation';
 import CreateEvent from './CreateEvent';
 import CreateEventConfirm from './CreateEventConfirm';
 import CreateGroup from './CreateGroup';
@@ -13,6 +14,7 @@ import CreateGroupConfirm from './CreateGroupConfirm';
 import Event from './Event';
 import Group from './Group';
 import Groups from './Groups';
+import Profile from '../profile/Profile';
 import { API, DEV } from '../../config';
 
 class GroupsView extends Component{
@@ -164,6 +166,22 @@ class GroupsView extends Component{
                   navigator={navigator}
                 />
               );
+            case 'Profile':
+              return (
+                <Profile
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
+            );
+            case 'Conversation':
+              return (
+                <Conversation
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
+            );
           }
         }}
       />

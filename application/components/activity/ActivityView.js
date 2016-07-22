@@ -4,8 +4,10 @@ import {
   StyleSheet
 } from 'react-native';
 
+import Conversation from '../messages/Conversation';
 import Activity from './Activity';
 import Event from '../groups/Event';
+import Profile from '../profile/Profile';
 import { API, DEV } from '../../config';
 
 class ActivityView extends Component{
@@ -78,6 +80,22 @@ class ActivityView extends Component{
                   {...this.props}
                   {...route}
                   {...this.state}
+                  navigator={navigator}
+                />
+            );
+            case 'Conversation':
+              return (
+                <Conversation
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
+            );
+            case 'Profile':
+              return (
+                <Profile
+                  {...this.props}
+                  {...route}
                   navigator={navigator}
                 />
             );

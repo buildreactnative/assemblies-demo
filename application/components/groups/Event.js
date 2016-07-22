@@ -150,15 +150,25 @@ class Event extends Component{
           { event.going.indexOf(currentUser.id) === -1 ? <JoinControls hasJoined={justJoined} joinEvent={this.joinEvent} /> : null}
           <View style={styles.infoContainer}>
             <Text style={styles.h2}>Going <Text style={styles.h4}>{event.going.length}</Text></Text>
-              {eventMembers.map((member, idx) => (
-                <TouchableOpacity key={idx} style={styles.memberContainer}>
-                  <Image source={{uri: member.avatar}} style={styles.avatar}/>
-                  <View style={styles.memberInfo}>
-                    <Text style={styles.h5}>{member.firstName} {member.lastName}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {eventMembers.map((member, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={() => {
+                  if (member.id !== currentUser.id){
+                    navigator.push({
+                      name: 'Profile',
+                      user: member
+                    })
+                  }
+                }}
+                style={styles.memberContainer}>
+                <Image source={{uri: member.avatar}} style={styles.avatar}/>
+                <View style={styles.memberInfo}>
+                  <Text style={styles.h5}>{member.firstName} {member.lastName}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
           <View style={styles.break} />
         </ScrollView>
       </View>
@@ -320,7 +330,6 @@ let styles = StyleSheet.create({
     marginVertical: 10,
   },
   joinButton: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

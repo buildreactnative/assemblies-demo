@@ -32,10 +32,6 @@ const AddGroupBox = ({ navigator }) => (
   </TouchableOpacity>
 );
 
-const GroupBox = ({ group }) => (
-  <View></View>
-);
-
 const EmptyGroupBox = () => (
   <View style={styles.groupsContainer}>
     <View style={styles.groupImage}>

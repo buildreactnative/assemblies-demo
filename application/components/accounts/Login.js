@@ -7,6 +7,7 @@ import {
   Dimensions,
   ScrollView,
   TextInput,
+  AsyncStorage,
   TouchableOpacity,
 } from 'react-native';
 
@@ -47,6 +48,8 @@ class Login extends Component{
       if (data.status === 401){
         this.setState({ errorMsg: 'Email or password was incorrect.' });
       } else {
+        console.log('DATA', data);
+        AsyncStorage.setItem('sid', data.id);
         fetch(`${API}/users/me`, {
           method: 'GET',
           headers: {

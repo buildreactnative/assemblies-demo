@@ -1,3 +1,11 @@
+import _ from 'underscore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import NavigationBar from 'react-native-navbar';
+import Dropdown, {
+  Select,
+  Option,
+  OptionList
+} from 'react-native-selectme';
 import React, { Component } from 'react';
 import {
   View,
@@ -8,23 +16,16 @@ import {
   StyleSheet,
   Dimensions
 } from 'react-native';
+
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import NavigationBar from 'react-native-navbar';
-import _ from 'underscore';
-import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
-import { DEV, API } from '../../config';
 import LeftButton from './LeftButton';
+import { DEV, API } from '../../config';
+import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 let ImagePickerManager = require('NativeModules').ImagePickerManager;
-import Dropdown, {
-  Select,
-  Option,
-  OptionList
-} from 'react-native-selectme';
 
-const TechnologyList = ({ technologies, handlePress }) => {
+export const TechnologyList = ({ technologies, handlePress }) => {
   return (
     <View style={styles.techOuterContainer}>
       {technologies.map((technology, idx) => (
@@ -150,7 +151,7 @@ export default class RegisterConfirm extends Component{
       <View style={styles.container}>
         <NavigationBar
           title={titleConfig}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>} 
+          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
           tintColor={Colors.brandPrimary}
         />
         <ScrollView ref="scrollView" style={styles.formContainer}>
@@ -325,7 +326,7 @@ let styles = StyleSheet.create({
   },
 });
 
-let selectStyles = {
+export const selectStyles = {
   backgroundColor: 'white',
   justifyContent: 'center',
   paddingLeft: 10,
@@ -333,12 +334,12 @@ let selectStyles = {
   borderBottomWidth: 0,
 };
 
-let optionTextStyles = {
+export const optionTextStyles = {
   fontSize: 18,
   fontWeight: '300',
 }
 
-let overlayStyles = {
+export const overlayStyles = {
   position: 'relative',
   width: window.width,
   height: window.height,
