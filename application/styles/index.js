@@ -3,6 +3,29 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
+export const selectStyles = {
+  backgroundColor: 'white',
+  borderBottomWidth: 0,
+  borderTopWidth: 0,
+  justifyContent: 'center',
+  paddingLeft: 10,
+};
+
+export const optionTextStyles = {
+  fontSize: 18,
+  fontWeight: '300',
+}
+
+export const overlayStyles = {
+  alignItems : "center",
+  backgroundColor : 'transparent',
+  flex : 1,
+  height: deviceHeight,
+  justifyContent : "flex-start",
+  position: 'relative',
+  width: deviceWidth,
+};
+
 export const autocompleteStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -16,21 +39,21 @@ export const autocompleteStyles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: 'white',
-    height: 28,
     borderRadius: 5,
-    paddingTop: 4.5,
+    fontSize: 18,
+    height: 28,
+    marginLeft: 8,
+    marginRight: 8,
+    marginTop: 7.5,
     paddingBottom: 4.5,
     paddingLeft: 10,
     paddingRight: 10,
-    marginTop: 7.5,
-    marginLeft: 8,
-    marginRight: 8,
-    fontSize: 18,
+    paddingTop: 4.5,
   },
   poweredContainer: {
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.inactive,
+    justifyContent: 'center',
   },
   powered: {
     marginTop: 15,
@@ -84,17 +107,17 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 15
   },
   h3: {
-    fontWeight: '400',
-    fontSize: 22,
-    textAlign: 'center',
     color: Colors.copyMedium,
+    fontSize: 22,
+    fontWeight: '400',
+    paddingHorizontal: 20,
     paddingVertical: 10,
-    paddingHorizontal: 20
+    textAlign: 'center',
   },
   h4: {
+    color: Colors.copyDark,
     fontSize: 20,
     fontWeight: '300',
-    color: Colors.copyDark,
     paddingHorizontal: 20,
     paddingVertical: 5,
   },
@@ -104,6 +127,10 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 10,
     textAlign: 'center',
   },
+  h6: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
   errorContainer: {
     paddingHorizontal: 15,
   },
@@ -112,7 +139,28 @@ export const formStyles = StyleSheet.create({
     fontWeight: '300',
     color: Colors.red
   },
-
+  avatarContainer: {
+    backgroundColor: 'white',
+    marginVertical: 15,
+    marginHorizontal: (deviceWidth - 250) / 2,
+    width: 250,
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarImageContainer: {
+    height: 120,
+    alignItems: 'center'
+  },
+  avatarImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    padding: 20,
+  },
   formField: {
     backgroundColor: 'white',
     height: 50,
@@ -128,10 +176,18 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   submitButton: {
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.brandPrimary,
     height: 70,
+    justifyContent: 'center',
+  },
+  textContainer: {
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+  },
+  technology: {
+    marginHorizontal: 4,
+    marginVertical: 8,
   }
 })
 
@@ -174,15 +230,15 @@ export const globals = StyleSheet.create({
     marginBottom: 20
   },
   button: {
-    height: 80,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.brandPrimary
+    backgroundColor: Colors.brandPrimary,
+    bottom: 0,
+    flexDirection: 'row',
+    height: 80,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
   buttonText: {
     color: 'white',

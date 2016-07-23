@@ -142,7 +142,7 @@ class Register extends Component{
          </View>
         </KeyboardAwareScrollView>
         <TouchableOpacity  style={styles.submitButton} onPress={this.handleSubmit}>
-          <Text style={Globals.submitButtonText}>Next</Text>
+          <Text style={globals.largeButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     )
