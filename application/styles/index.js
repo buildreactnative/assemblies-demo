@@ -3,6 +3,42 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
+export const activityStyles = {
+  h4: {
+    color: Colors.bodyText,
+    fontSize: 16,
+    fontWeight: '400',
+    paddingHorizontal: 10,
+  },
+  h5: {
+    color: Colors.bodyText,
+    fontSize: 15,
+    fontWeight: '300',
+    paddingHorizontal: 10,
+  },
+  dateText: {
+    fontSize: 14,
+    paddingBottom: 4,
+    fontWeight: '300',
+    fontStyle: 'italic',
+    color: Colors.bodyText,
+  },
+  messageText: {
+    color: Colors.bodyText,
+    marginLeft: 50,
+    fontSize: 14,
+    fontStyle: 'italic',
+    fontWeight: '300',
+  },
+  circle: {
+    backgroundColor: Colors.brandPrimary,
+    borderRadius: 7.5,
+    height: 15,
+    marginHorizontal: 10,
+    width: 15,
+  }
+};
+
 export const selectStyles = {
   backgroundColor: 'white',
   borderBottomWidth: 0,
@@ -214,6 +250,12 @@ export const globals = StyleSheet.create({
   h4: {
     fontSize: 20
   },
+  pv1: {
+    paddingVertical: 10
+  },
+  ph1: {
+    paddingHorizontal: 10
+  },
   mt1: {
     marginTop: 10
   },
@@ -258,5 +300,23 @@ export const globals = StyleSheet.create({
   },
   inactive: {
     backgroundColor: Colors.inactive
-  }
+  },
+  map: {
+    backgroundColor: Colors.inactive,
+    height: (deviceHeight / 3),
+    width: deviceWidth
+  },
+  flexRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  divider: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginHorizontal: 10,
+  },
+  textContainer: {
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+  },
 });

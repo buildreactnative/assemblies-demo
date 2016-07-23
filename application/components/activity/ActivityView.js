@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Navigator } from 'react-native';
+import { extend } from 'underscore';
 
 import Activity from './Activity';
 import Conversation from '../messages/Conversation';
@@ -29,16 +30,16 @@ class ActivityView extends Component{
     };
     fetch(`${API}/notifications?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(notifications => this._loadNextEvent(notifications))
+    .then(notifications => this._loadNextEvents(notifications))
     .catch(err => {})
     .done();
   }
-  _loadNextEvent(notifications){
+  _loadNextEvents(notifications){
     this.setState({ notifications });
     let dateQuery = { end: { $gt: new Date().valueOf() }};
     let query = {
       $or: [
-        extend(dateQuery, { $elemMatch: { going: this.props.curentUser.id }}),
+        extend(dateQuery, { going: { $elemMatch: { $eq: this.props.currentUser.id }}}),
         extend(dateQuery, { 'location.city.long_name': this.props.currentUser.location.city.long_name })
       ],
       $limit: 1,
@@ -46,7 +47,10 @@ class ActivityView extends Component{
     };
     fetch(`${API}/events?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(nextEvents => this.setState({ nextEvents }))
+    .then(nextEvents => {
+      console.log('NEXT EVENTS', nextEvents);
+      this.setState({ nextEvents })
+    })
     .catch(err => {})
     .done();
   }
