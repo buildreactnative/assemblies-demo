@@ -12,75 +12,73 @@ import {
   AsyncStorage
 } from 'react-native';
 
-import Landing from './application/components/Landing';
 import Dashboard from './application/components/Dashboard';
-import Register from './application/components/accounts/Register';
-import Login from './application/components/accounts/Login';
-import RegisterConfirm from './application/components/accounts/RegisterConfirm';
+import Landing from './application/components/Landing';
 import Loading from './application/components/utilities/Loading';
+import Login from './application/components/accounts/Login';
+import Register from './application/components/accounts/Register';
+import RegisterConfirm from './application/components/accounts/RegisterConfirm';
 import { API, DEV } from './application/config';
+import Headers from './application/fixtures/headers';
 
 class assemblies extends Component {
   constructor(){
     super();
     this.updateUser = this.updateUser.bind(this);
     this.state = {
-      user: null,
-      ready: false,
-      initialRoute: 'Landing'
-    }
-  }
-  async _loadLoginCredentials(){
-    try {
-      let sid = await AsyncStorage.getItem('sid');
-      if (sid){
-        fetch(`${API}/users/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Set-Cookie': `sid=${sid}`
-          }
-        })
-        .then(response => response.json())
-        .then(data => { this.setState({ user: data, ready: true, initialRoute: 'Dashboard' }) })
-        .catch(err => {
-          if (DEV) { console.log('Connection error ', err); }
-          this.setState({ ready: true })
-        })
-        .done();
-      } else {
-        this.setState({ ready: true })
-      }
-    } catch (err) {
-      this.setState({ ready: true })
+      user          : null,
+      ready         : false,
+      initialRoute  : 'Landing'
     }
   }
   componentDidMount(){
     this._loadLoginCredentials();
   }
-  updateUser(user){
-    this.setState({ user: user });
-    if (!user){
-      this.nav.push({ name: 'Landing' })
+  async _loadLoginCredentials(){
+    /* fetch session id from AsyncStorage to enable persistent user login */
+    try {
+      let sid = await AsyncStorage.getItem('sid');
+      if (sid) {
+        this.fetchUser(sid);
+      } else {
+        this.ready();
+      }
+    } catch (err) {
+      this.ready();
     }
   }
+  ready(){ /* render screen */
+    this.setState({ ready: true })
+  }
+  fetchUser(sid){
+    /* fetch user with session id */
+    fetch(`${API}/users/me`, { headers: extend(Headers, { 'Set-Cookie': `sid=${sid}`}) })
+    .then(response => response.json())
+    .then(user => this.setState({ user, ready: true, initialRoute: 'Dashboard' }))
+    .catch(err => this.ready())
+    .done();
+  }
+  updateUser(user){
+    this.setState({ user: user });
+    if (!user) this.nav.push({ name: 'Landing' })
+  }
   render() {
-    let { user, ready, initialRoute } = this.state;
-    if (! ready ) { return <Loading /> }
+    if (! this.state.ready ) { return <Loading /> }
     return (
       <Navigator
-        ref={(el) => {this.nav = el}}
-        initialRoute={{name: initialRoute, index: 0}}
+        ref={(el) => this.nav = el }
+        initialRoute={{ name: this.state.initialRoute }}
         renderScene={(route, navigator) => {
         switch(route.name){
           case 'Landing':
-            return <Landing navigator={navigator} />
-            break;
+            return (
+              <Landing navigator={navigator} />
+            );
           case 'Dashboard':
             return (
               <Dashboard
                 navigator={navigator}
-                currentUser={user}
+                currentUser={this.state.user}
                 updateUser={this.updateUser}
               />
             );
@@ -107,25 +105,6 @@ class assemblies extends Component {
       />
     );
   }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+};
 
 AppRegistry.registerComponent('assemblies', () => assemblies);
