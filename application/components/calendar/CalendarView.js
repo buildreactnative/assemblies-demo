@@ -1,62 +1,63 @@
 import React, { Component } from 'react';
-import {
-  Navigator,
-  StyleSheet
-} from 'react-native';
+import { Navigator } from 'react-native';
 
 import Calendar from './Calendar';
 import Event from '../groups/Event';
 import Profile from '../profile/Profile';
 import Conversation from '../messages/Conversation';
 import { API, DEV } from '../../config';
+import { extend } from 'underscore';
+import { globals } from '../../styles';
 
 class CalendarView extends Component{
   constructor(){
     super();
     this.state = {
-      events: [],
-      ready: false,
+      events  : [],
+      ready   : false,
     }
   }
-  componentDidMount(){
-    let { currentUser } = this.props;
-    let groupsQuery = {
+  _loadGroups(){
+    let query = {
       members: {
         $elemMatch: {
-          userId: currentUser.id
+          userId: this.props.currentUser.id
         }
       }
     };
-    fetch(`${API}/groups?${JSON.stringify(groupsQuery)}`)
+    fetch(`${API}/groups?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(groups => {
-      let eventsQuery = {
-        $or: [
-          { groupId: { $in: groups.map(g => g.id) }, start: { $gt: new Date().valueOf() } },
-          {  going: { $elemMatch: { $eq: currentUser.id }}, start: { $gt: new Date().valueOf() } },
-          { 'location.city.long_name': currentUser.location.city.long_name, start: { $gt: new Date().valueOf() } }
-        ]
-      }
-      fetch(`${API}/events?${JSON.stringify(eventsQuery)}`)
-      .then(response => response.json())
-      .then(events => {
-        console.log('EVENTS', events);
-        this.setState({ events, ready: true })
-      })
-      .catch(err => {
-        console.log('FETCH EVENTS ERROR: ', err)
-        this.setState({ ready: true })
-      })
-      .done()
-    })
-    .catch(err => console.log('FETCH GROUPS ERROR: ', err))
+    .then(groups => this._loadEvents(groups))
+    .catch(err => this.ready(err))
+    .done()
+  }
+  ready(err){
+    this.setState({ ready: true });
+  }
+  _loadEvents(groups){
+    let dateQuery = { end: { $gt: new Date().valueOf() }};
+    let query = {
+      $or: [
+        extend(dateQuery, { groupId: { $in: groups.map((g) => g.id) }}),
+        extend(dateQuery, { going:  { $elemMatch: { $eq: this.props.currentUser.id }}}),
+        extend(dateQuery, { 'location.city.long_name': this.props.currentUser.location.city.long_name })
+      ],
+      $limit: 20,
+    };
+    fetch(`${API}/events?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(events => this.setState({ events, ready: true }))
+    .catch(err => this.ready(err))
     .done();
+  }
+  componentDidMount(){
+    this._loadGroups();
   }
   render(){
     return (
       <Navigator
         initialRoute={{ name: 'Calendar' }}
-        style={styles.container}
+        style={globals.flex}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'Calendar':
@@ -98,12 +99,6 @@ class CalendarView extends Component{
       />
     )
   }
-}
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
+};
 
 export default CalendarView;
