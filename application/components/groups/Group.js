@@ -1,30 +1,30 @@
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
-import Swipeout from '../3rd_party/react-native-swipeout';
 import React, { Component } from 'react';
 import {
   View,
   ListView,
   ScrollView,
-  Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
   Text,
   Image,
   ActionSheetIOS,
-  StyleSheet
 } from 'react-native';
-import { find } from 'underscore';
+import { find, findIndex, isEqual } from 'underscore';
 
+import Headers from '../../fixtures/headers';
 import LeftNavButton from '../shared/LeftNavButton';
+import Swipeout from '../3rd_party/react-native-swipeout';
 import { API, DEV } from '../../config';
+import { globals, groupsStyles } from '../../styles';
+import { isMember, showJoinButton, rowHasChanged } from '../../utilities';
 
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
+const styles = groupsStyles;
 
 const OptionsButton = ({ openActionSheet }) => {
   return (
-    <TouchableOpacity style={styles.addButton} onPress={openActionSheet}>
+    <TouchableOpacity style={globals.pa1} onPress={openActionSheet}>
       <Icon name="ios-more" size={25} color="#ccc" />
     </TouchableOpacity>
   )
@@ -43,151 +43,198 @@ class EventList extends Component{
   constructor(){
     super();
     this._renderRow = this._renderRow.bind(this);
-    this.visitEvent = this.visitEvent.bind(this);
   }
-  visitEvent(event){
-    let { navigator, updateEvents, group } = this.props;
-    navigator.push({
-      name: 'Event',
-      event,
-      group,
-     })
-  }
-  _renderRow(event, sectionID, rowID){
-    let { currentUser, cancelRSVP, joinEvent, events, navigator, group } = this.props;
-    let going = find(event.going, (g) => g === currentUser.id);
-    let right = [{
-      text: 'RSVP',
-      type: 'primary',
-      onPress: () => { joinEvent(event, currentUser) }
-    }];
-    if (going) {
-      right = [{
+  getButtons(isGoing, event, currentUser){
+    if (isGoing){
+      return [{
         text: 'Cancel',
         type: 'delete',
-        onPress: () => { cancelRSVP(event, currentUser) }
+        onPress: () => { this.props.cancelRSVP(event, currentUser) }
+      }];
+    } else {
+      return [{
+        text: 'RSVP',
+        type: 'primary',
+        onPress: () => { this.props.joinEvent(event, currentUser) }
       }];
     }
+  }
+  _renderRow(event, sectionID, rowID){
+    let { currentUser, events, group } = this.props;
+    let isGoing = find(event.going, (id) => isEqual(id, currentUser.id));
+    let right = this.getButtons(isGoing, event, currentUser);
     return (
-      <Swipeout
-        backgroundColor='white'
-        rowID={rowID}
-        right={right}
-      >
+      <Swipeout backgroundColor='white' rowID={rowID} right={right}>
         <View style={styles.eventContainer}>
-          <TouchableOpacity style={styles.eventInfo} onPress={() => this.visitEvent(event)}>
-            <Text style={styles.h5}>{event.name}</Text>
+          <TouchableOpacity style={globals.flex} onPress={() => this.props.visitEvent(event)}>
+            <Text style={globals.h5}>{event.name}</Text>
             <Text style={styles.h4}>{moment(event.start).format('dddd, MMM Do')}</Text>
             <Text style={styles.h4}>{event.going.length} Going</Text>
           </TouchableOpacity>
-          <View style={styles.goingContainer}>
-            <Text style={styles.goingText}>{going ? "You're Going" : "Want to go?"}</Text>
-            {going ? <Icon name="ios-checkmark" size={30} color={Colors.brandPrimary} /> : <Icon name="ios-add" size={30} color={Colors.brandPrimary} /> }
+          <View style={[globals.flexRow, globals.pa1]}>
+            <Text style={[globals.primaryText, styles.h4, globals.ph1]}>
+              {isGoing ? "You're Going" : "Want to go?"}
+            </Text>
+            {isGoing ? <Icon name="ios-checkmark" size={30} color={Colors.brandPrimary} /> : <Icon name="ios-add" size={30} color={Colors.brandPrimary} /> }
           </View>
         </View>
       </Swipeout>
     )
   }
+  dataSource(){
+    return (
+      new ListView.DataSource({ rowHasChanged }).cloneWithRows(this.props.events)
+    );
+  }
   render(){
-    let { events } = this.props
+    if (! this.props.events.length ){ return <Text style={[globals.h5, globals.mh2]}>No events scheduled</Text>}
     return (
       <ListView
         enableEmptySections={true}
-        dataSource={new ListView.DataSource({rowHasChanged: (r1, r2) => r1 != r2 }).cloneWithRows(events)}
-        renderRow={this._renderRow.bind(this)}
-        style={styles.listview}
+        dataSource={this.dataSource()}
+        renderRow={this._renderRow}
+        scrollEnabled={false}
+        style={globals.flex}
       />
     )
   }
 };
 
-class Group extends Component{
-  constructor(){
-    super();
-    this._renderJoin = this._renderJoin.bind(this);
-    this.openActionSheet = this.openActionSheet.bind(this);
-    this.cancelRSVP = this.cancelRSVP.bind(this);
-    this.joinEvent = this.joinEvent.bind(this);
-    this.state = {
-      users: [],
-      events: [],
-      ready: false,
-    }
-  }
-  cancelRSVP(event, currentUser){
-    console.log('CANCEL RSVP', event, currentUser);
-    let { events } = this.state;
-    event.going = event.going.filter(userId => userId !== currentUser.id);
-    let idx = events.map(evt => evt.id).indexOf(event.id);
-    this.setState({ events: [
-      ...events.slice(0, idx),
-      event,
-      ...events.slice(idx + 1)
-    ]});
-    this.updateEventGoing(event);
-  }
-  updateEventGoing(event){
-    fetch(`${API}/events/${event.id}`, {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ going: event.going })
-    })
-    .then(response => response.json())
-    .then(data => console.log('RESPONSE', data))
-    .catch(err => console.log('ERROR', err))
-    .done();
-  }
-  joinEvent(event, currentUser){
-    console.log('JOIN RSVP', event, currentUser);
-    let { events } = this.state;
-    event.going = event.going.concat(currentUser.id);
-    let idx = events.map(evt => evt.id).indexOf(event.id);
-    this.setState({ events: [
-      ...events.slice(0, idx),
-      event,
-      ...events.slice(idx + 1)
-    ]});
-    this.updateEventGoing(event);
-  }
-  componentDidMount(){
-    let { group } = this.props;
-    let eventsQuery = { groupId: group.id, start: { $gt: new Date().valueOf() } };
-    fetch(`${API}/events?${JSON.stringify(eventsQuery)}`)
-    .then(response => response.json())
-    .then(events => {
-      this.setState({ events, ready: true });
-      let query = {
-        id: { $in: group.members.map(member => member.userId) }
-      }
-      fetch(`${API}/users?${JSON.stringify(query)}`)
-      .then(response => response.json())
-      .then(users => this.setState({ users, ready: true }))
-      .catch(err => { if (DEV) console.log('FETCH USERS ERROR: ', err)})
-      .done();
-    })
-    .catch(err => this.setState({ ready: true }))
-    .done();
-  }
-  _renderJoin(){
-    let {group, currentUser, addUserToGroup} = this.props;
-    let isMember = group.members.map(m => m.userId).indexOf(currentUser.id) !== -1;
+class JoinButton extends Component{
+  render(){
+    let { addUserToGroup, group, currentUser } = this.props
+    let hasJoined = isMember(group, currentUser);
     return (
-      <View style={styles.joinContainer}>
-        <TouchableOpacity
-          onPress={() => addUserToGroup(group, currentUser)}
-          style={styles.joinButton}>
-          <Text style={styles.joinText}>{ isMember ? 'Joined' : 'Join'}</Text>
-          { isMember ? <Joined /> : <Join /> }
+      <View style={[styles.joinButtonContainer, globals.mv1]}>
+        <TouchableOpacity onPress={() => addUserToGroup(group, currentUser)} style={styles.joinButton}>
+          <Text style={styles.joinButtonText}>{ hasJoined ? 'Joined' : 'Join'}</Text>
+          { hasJoined ? <Joined /> : <Join /> }
         </TouchableOpacity>
       </View>
     )
   }
+}
+
+const GroupMembers = ({ users, members, handlePress }) => {
+  return (
+    <View style={globals.flex}>
+      {members.map((member, idx) => {
+        let user = find(users, ({ id }) => isEqual(id, member.userId));
+        if ( ! user ) { return; }
+        return (
+          <TouchableOpacity key={idx} style={globals.flexRow} onPress={() => handlePress(user)}>
+            <Image source={{uri: user.avatar}} style={globals.avatar}/>
+            <View style={globals.textContainer}>
+              <Text style={globals.h5}>{user.firstName} {user.lastName}</Text>
+              <Text style={[styles.h4, globals.mh1]}>{member.role}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+      })}
+    </View>
+  );
+}
+
+class Group extends Component{
+  constructor(){
+    super();
+    this.openActionSheet = this.openActionSheet.bind(this);
+    this.cancelRSVP = this.cancelRSVP.bind(this);
+    this.joinEvent = this.joinEvent.bind(this);
+    this.goBack = this.goBack.bind(this);
+    this.visitProfile = this.visitProfile.bind(this);
+    this.visitEvent = this.visitEvent.bind(this);
+    this.visitCreateEvent = this.visitCreateEvent.bind(this);
+    this.state = {
+      events    : [],
+      ready     : false,
+      users     : [],
+    }
+  }
+
+  componentDidMount(){
+    this._loadEvents();
+  }
+
+  _loadEvents(){
+    let query = {
+      groupId: this.props.group.id,
+      end: { $gt: new Date().valueOf() },
+      $limit: 10,
+      $sort: { start: -1 }
+    };
+    fetch(`${API}/events?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(events => this._loadUsers(events))
+    .catch(err => {})
+    .done();
+  }
+
+  _loadUsers(events){
+    this.setState({ events })
+    let query = {
+      id: { $in: this.props.group.members.map(({ userId }) => userId ) },
+      $limit: 100
+    };
+    fetch(`${API}/users?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(users => this.setState({ users, ready: true }))
+    .catch(err => {})
+    .done();
+  }
+
+  cancelRSVP(event, currentUser){
+    let updatedEvent = {
+      ...event,
+      going: event.going.filter((userId) => ! isEqual(userId, currentUser.id))
+    };
+    let index = findIndex(this.state.events, ({ id }) => isEqual(id, event.id));
+    let updatedEvents = [
+      ...this.state.events.slice(0, index),
+      updatedEvent,
+      ...this.state.events.slice(index + 1)
+    ];
+    this.setState({ events: updatedEvents })
+    this.updateEventGoing(event);
+  }
+
+  updateEventGoing(event){
+    fetch(`${API}/events/${event.id}`, {
+      method: 'PUT',
+      headers: Headers,
+      body: JSON.stringify({
+        going: event.going
+      })
+    })
+    .then(response => response.json())
+    .then(data => {})
+    .catch(err => {})
+    .done();
+  }
+
+  joinEvent(event, currentUser){
+    let { events } = this.state;
+    let updatedEvent = {
+      ...event,
+      going: [ ...event.going, currentUser.id ]
+    };
+    let index = findIndex(this.state.events, ({ id }) => isEqual(id, event.id));
+    let updatedEvents = [
+      ...this.state.events.slice(0, index),
+      updatedEvent,
+      ...this.state.events.slice(index + 1)
+    ];
+    this.setState({ events: updatedEvents })
+    this.updateEventGoing(event);
+  }
+
   openActionSheet(){
-    let { group, currentUser, unsubscribeFromGroup, navigator } = this.props;
-    let user = find(group.members, (member) => member.userId === currentUser.id);
+    let { group, currentUser } = this.props;
+    let member = find(group.members, ({ userId }) => isEqual(userId, currentUser.id));
     let buttonActions = ['Unsubscribe', 'Cancel'];
-    if (user && user.role === 'admin' || user.role === 'owner')
+    if (member && member.role === 'owner') {
       buttonActions.unshift('Create Event');
+    }
     let options = {
       options: buttonActions,
       cancelButtonIndex: buttonActions.length-1
@@ -195,228 +242,86 @@ class Group extends Component{
     ActionSheetIOS.showActionSheetWithOptions(options, (buttonIndex) => {
       switch(buttonActions[buttonIndex]){
         case 'Unsubscribe':
-          unsubscribeFromGroup(group, currentUser);
+          this.props.unsubscribeFromGroup(group, currentUser);
           break;
         case 'Create Event':
-          navigator.push({ name: 'CreateEvent', group })
-          console.log('CREATE EVENT')
+          this.visitCreateEvent(group);
           break;
         default:
           return;
       }
     });
   }
+  goBack(){
+    this.props.navigator.replacePreviousAndPop({ name: 'Groups' });
+  }
+  visitProfile(user){
+    this.props.navigator.push({
+      name: 'Profile',
+      user
+    })
+  }
+  visitEvent(event){
+    this.props.navigator.push({
+      name: 'Event',
+      group: this.props.group,
+      event,
+    })
+  }
+  visitCreateEvent(group){
+    this.props.navigator.push({
+      name: 'CreateEvent',
+      group
+    })
+  }
   render(){
-    let { users, events } = this.state;
-    let { group, currentUser, navigator } = this.props;
-    if (DEV) console.log('NAV', navigator);
+    let { group, currentUser } = this.props;
+    let showButton = showJoinButton(this.state.users, currentUser) && this.state.ready;
     return (
-      <View style={styles.container}>
+      <View style={globals.flexContainer}>
         <NavigationBar
           title={{title: group.name, tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftNavButton handlePress={() => navigator.replacePreviousAndPop({name: 'Groups'})}/>}
+          leftButton={<LeftNavButton handlePress={this.goBack}/>}
           rightButton={<OptionsButton openActionSheet={this.openActionSheet}/>}
         />
-        <ScrollView style={styles.scrollView}>
-          <Image source={{uri: group.image}} style={styles.topImage}>
+        <ScrollView style={globals.flex}>
+          <Image source={{uri: group.image}} style={styles.groupTopImage}>
             <View style={styles.overlayBlur}>
               <Text style={styles.h1}>{group.name}</Text>
             </View>
             <View style={styles.bottomPanel}>
-              <Text style={styles.memberText}>{group.members.length} {group.members.length === 1 ? 'member' : 'members'}</Text>
+              <Text style={[globals.h4, globals.primaryText]}>
+                {group.members.length} {group.members.length === 1 ? 'member' : 'members'}
+              </Text>
             </View>
           </Image>
           <Text style={styles.h2}>Summary</Text>
-          <Text style={[styles.h4, {paddingHorizontal: 20,}]}>{group.description}</Text>
+          <Text style={[globals.h5, globals.ph2]}>{group.description}</Text>
           <Text style={styles.h2}>Technologies</Text>
-          <Text style={styles.h3}>{group.technologies.join(', ')}</Text>
-          { group.members.map(m => m.userId).indexOf(currentUser.id) === -1 ? this._renderJoin() : null}
+          <Text style={[globals.h5, globals.ph2]}>{group.technologies.join(', ')}</Text>
+          <View style={globals.lightDivider}/>
+          { showButton ? <JoinButton addUserToGroup={this.props.addUserToGroup} group={group} currentUser={currentUser} /> : null }
           <Text style={styles.h2}>Events</Text>
           <EventList
             {...this.state}
             {...this.props}
+            visitEvent={this.visitEvent}
             joinEvent={this.joinEvent}
             cancelRSVP={this.cancelRSVP}
           />
-          <View style={styles.break} />
+          <View style={globals.lightDivider} />
           <Text style={styles.h2}>Members</Text>
-          <View style={styles.break} />
-          {group.members.map((member, idx) => {
-            if (DEV) {console.log('MEMBER', member)}
-            let user = find(users, (u => u.id === member.userId))
-            let isOwner = member.role === 'owner';
-            let isAdmin = member.role === 'admin';
-            let status = isOwner ? 'owner' : isAdmin ? 'admin' : 'member'
-            if ( ! user ) { return; }
-            return (
-              <TouchableOpacity key={idx} style={styles.memberContainer} onPress={() => {
-                  this.props.navigator.push({
-                    name: 'Profile',
-                    user: user
-                  })
-                }}>
-                <Image source={{uri: user.avatar}} style={styles.avatar}/>
-                <View style={styles.memberInfo}>
-                  <Text style={styles.h5}>{user.firstName} {user.lastName}</Text>
-                  <Text style={styles.h4}>{status}</Text>
-                </View>
-              </TouchableOpacity>
-            )
-          })}
+          <View style={globals.lightDivider} />
+          <GroupMembers
+            members={group.members}
+            users={this.state.users}
+            handlePress={this.visitProfile}
+          />
         </ScrollView>
       </View>
     )
   }
-}
-
-let styles = StyleSheet.create({
-  backButton: {
-    paddingLeft: 20,
-    paddingBottom: 10,
-    backgroundColor: 'transparent',
-  },
-  addButton: {
-    backgroundColor: 'transparent',
-    paddingRight: 20,
-    paddingTop: 10
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  topImage: {
-    width: deviceWidth,
-    height: 200,
-    flexDirection: 'column',
-  },
-  overlayBlur: {
-    backgroundColor: '#333',
-    opacity: 0.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  h1: {
-    fontSize: 22,
-    color: 'white',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  bottomPanel: {
-    flex: 0.3,
-    backgroundColor: 'white',
-    opacity: 0.8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  memberText: {
-    textAlign: 'center',
-    color: Colors.brandPrimary,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  listview: {
-    flex: 1,
-  },
-  h4: {
-    fontSize: 16,
-    fontWeight: '300',
-  },
-  h3: {
-    fontSize: 16,
-    color: Colors.brandPrimary,
-    paddingHorizontal: 18,
-    paddingVertical: 5,
-    fontWeight: '400',
-  },
-  break: {
-    height: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginHorizontal: 15,
-    marginVertical: 5,
-  },
-  h2: {
-    fontSize: 20,
-    fontWeight: '400',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  eventContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  joinContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    height: 50,
-  },
-  joinButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    backgroundColor: Colors.brandPrimary,
-  },
-  joinedContainer: {
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'white'
-  },
-  joinText: {
-    fontSize: 22,
-    color: 'white',
-    fontWeight: 'bold',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    textAlign: 'center',
-  },
-  joinIcon: {
-
-  },
-  eventInfo: {
-    flex: 1,
-  },
-  h5: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  goingContainer: {
-    flex: 0.8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  goingText: {
-    fontSize: 17,
-    color: Colors.brandPrimary
-  },
-  memberContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  avatar: {
-    height: 70,
-    width: 70,
-    borderRadius: 35,
-  },
-  memberInfo: {
-    paddingLeft: 30,
-  },
-});
+};
 
 export default Group;

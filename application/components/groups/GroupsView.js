@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Navigator } from 'react-native';
-import { find } from 'underscore';
+import { find, isEqual } from 'underscore';
 
 import Conversation from '../messages/Conversation';
 import CreateEvent from './CreateEvent';
@@ -10,10 +10,10 @@ import CreateGroupConfirm from './CreateGroupConfirm';
 import Event from './Event';
 import Group from './Group';
 import Groups from './Groups';
-import Profile from '../profile/Profile';
-import { globals } from '../../styles';
-import { API, DEV } from '../../config';
 import Headers from '../../fixtures/headers';
+import Profile from '../profile/Profile';
+import { API, DEV } from '../../config';
+import { globals } from '../../styles';
 
 class GroupsView extends Component{
   constructor(){
@@ -50,13 +50,16 @@ class GroupsView extends Component{
     this.setState({ groups, ready: true });
     let query = { /* query groups that the user does not belong to but are nearby */
       id: { $nin: groups.map(group => group.id) },
-      'location.city.long_name': currentUser.location.city.long_name,
+      'location.city.long_name': this.props.currentUser.location.city.long_name,
       $limit: 4
     };
     fetch(`${API}/groups/?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(suggestedGroups => this.setState({ suggestedGroups }))
-    .catch(err => {})
+    .then(suggestedGroups => {
+      console.log('SUGGESTED GROUPS', suggestedGroups)
+      this.setState({ suggestedGroups })
+    })
+    .catch(err => this.ready(err))
     .done();
   }
   unsubscribeFromGroup(group, currentUser){
@@ -96,14 +99,10 @@ class GroupsView extends Component{
         email: true
       }
     };
-    if (find(group.members, ({ userId}) => userId === currentUser.id) == 'undefined'){
-      group.members = [
-        ...group.members, member
-      ];
-      groups = [
-        ...groups, group
-      ];
-      suggestedGroups = suggestedGroups.filter(({ id }) => id !== group.id);
+    if (! find(group.members, ({ userId}) => isEqual(userId, currentUser.id))){
+      group.members = [ ...group.members, member ];
+      groups = [ ...groups, group ];
+      suggestedGroups = suggestedGroups.filter(({ id }) => ! isEqual(id, group.id));
       this.setState({ groups, suggestedGroups })
       this.updateGroup(group);
     }

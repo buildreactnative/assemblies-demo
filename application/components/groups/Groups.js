@@ -80,9 +80,9 @@ const SuggestedGroupBoxes = ({ groups, visitGroup }) => {
       {groups.map((group, idx) => {
         if (!group) { return <EmptyGroupBox key={idx}/>}
         return (
-          <TouchableOpacity key={idx} style={styles.groupsContainer} onPress={() => visitGroup(group)}>
+          <TouchableOpacity key={idx} style={globals.flexRow} onPress={() => visitGroup(group)}>
             <Image source={{uri: group.image}} style={styles.groupImage}>
-              <View style={[styles.group, {backgroundColor: group.color,}]} >
+              <View style={[styles.groupBackground, {backgroundColor: group.color,}]} >
                 <Text style={styles.groupText}>{group.name}</Text>
               </View>
             </Image>
@@ -124,15 +124,15 @@ class Groups extends Component{
           tintColor={Colors.brandPrimary}
           rightButton={<AddButton handlePress={this.visitCreateGroup}/>}
         />
-        <ScrollView style={[globals.flex, globals.pa1]}>
-          <Text style={globals.h4}>Your Assemblies</Text>
+        <ScrollView style={[globals.flex, globals.mt1]}>
+          <Text style={[globals.h4, globals.mh2]}>Your Assemblies</Text>
           <GroupBoxes
             groups={formatGroups(groups)}
             navigator={navigator}
             visitGroup={this.visitGroup}
             visitCreateGroup={this.visitCreateGroup}
           />
-          <Text style={globals.h4}>You Might Like</Text>
+          <Text style={[globals.h4, globals.mh2]}>You Might Like</Text>
           <SuggestedGroupBoxes
             groups={formatGroups(suggestedGroups)}
             navigator={navigator}
