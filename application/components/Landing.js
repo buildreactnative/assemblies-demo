@@ -1,7 +1,6 @@
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   Text,
   TouchableOpacity,
   Image,
@@ -12,6 +11,7 @@ import Colors from '../styles/colors';
 import { landingStyles } from '../styles';
 import { globals } from '../styles';
 
+const backgroundImageSrc = 'https://s3-us-west-2.amazonaws.com/assembliesapp/welcome%402x.png';
 const styles = landingStyles;
 
 class Landing extends Component{
@@ -30,7 +30,7 @@ class Landing extends Component{
     return (
       <View style={styles.container}>
         <View style={styles.container}>
-          <Image style={styles.backgroundImage} source={require('../assets/images/welcome.png')}/>
+          <Image style={styles.backgroundImage} source={{ uri: backgroundImageSrc }}/>
         </View>
         <View style={globals.flexCenter}>
           <Image style={styles.logo} source={require('../assets/images/logo.png')}/>

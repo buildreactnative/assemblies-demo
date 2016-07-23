@@ -43,7 +43,7 @@ export default class Activity extends Component{
   _renderNotification(notification){
     let { updateTab } = this.props;
     return (
-      <TouchableOpacity style={styles.notificationsContainer} onPress={() => updateTab(notification.type)}>
+      <TouchableOpacity style={styles.notificationsContainer}>
         <View style={{ flex: 1 }}>
           <View style={styles.row}>
             <View style={styles.seenCircle}/>

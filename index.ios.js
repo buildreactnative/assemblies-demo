@@ -34,8 +34,7 @@ class assemblies extends Component {
   componentDidMount(){
     this._loadLoginCredentials();
   }
-  async _loadLoginCredentials(){
-    /* fetch session id from AsyncStorage to enable persistent user login */
+  async _loadLoginCredentials(){ /* fetch session id from AsyncStorage to enable persistent user login */
     try {
       let sid = await AsyncStorage.getItem('sid');
       if (sid) {
@@ -50,8 +49,7 @@ class assemblies extends Component {
   ready(){ /* render screen */
     this.setState({ ready: true })
   }
-  fetchUser(sid){
-    /* fetch user with session id */
+  fetchUser(sid){ /* fetch user with session id */
     fetch(`${API}/users/me`, { headers: extend(Headers, { 'Set-Cookie': `sid=${sid}`}) })
     .then(response => response.json())
     .then(user => this.setState({ user, ready: true, initialRoute: 'Dashboard' }))

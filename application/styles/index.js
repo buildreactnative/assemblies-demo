@@ -1,9 +1,9 @@
 import Colors from './colors';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
-export const landingStyles = {
+export const landingStyles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'absolute',
@@ -23,13 +23,20 @@ export const landingStyles = {
     height: 90,
     width: 90
   },
-};
+});
 
-export const globals = {
+export const globals = StyleSheet.create({
+  flex: {
+    flex: 1
+  },
   flexCenter: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  flexContainer: {
+    flex: 1,
+    backgroundColor: 'white'
   },
   lightText: {
     color: 'white'
@@ -81,4 +88,4 @@ export const globals = {
   inactive: {
     backgroundColor: Colors.inactive
   }
-}
+});

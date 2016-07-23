@@ -1,122 +1,85 @@
-import React, { Component } from 'react';
-
-import {
-  Dimensions,
-  TabBarIOS,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-
 import Icon, { TabBarItemIOS } from 'react-native-vector-icons/Ionicons';
-import ProfileView from './profile/ProfileView';
-import MessagesView from './messages/MessagesView';
+import React, { Component } from 'react';
+import { TabBarIOS } from 'react-native';
+
 import ActivityView from './activity/ActivityView';
-import { DEV, API } from '../config';
 import CalendarView from './calendar/CalendarView';
 import GroupsView from './groups/GroupsView';
+import Headers from '../fixtures/headers';
+import MessagesView from './messages/MessagesView';
+import ProfileView from './profile/ProfileView';
+import { DEV, API } from '../config';
+import { globals } from '../styles';
 
-export default class Dashboard extends Component{
+class Dashboard extends Component{
   constructor(props){
     super(props);
     this.logout = this.logout.bind(this);
-    this.updateTab = this.updateTab.bind(this);
+    this.setTab = this.setTab.bind(this);
     this.state = {
       selectedTab: 'Activity',
     };
   }
-  updateTab(type){
-    switch(type){
-      case 'Message':
-        this.setState({ selectedTab: 'Messages'});
-        break;
-      case 'Event':
-        this.setState({ selectedTab: 'Groups'});
-        break;
-    }
-  }
-  logout(){
-    fetch(`${API}/users/logout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+  logout(){ /* end the current session and redirect to the Landing page */
+    fetch(`${API}/users/logout`, { method: 'POST', headers: Headers })
     .then(response => response.json())
-    .then(data => {
-      this.props.navigator.popToTop();
-    })
+    .then(data => this.props.navigator.popToTop())
     .catch(err => {})
     .done();
   }
+  setTab(tab) { /* change the tabbar location */
+    this.setState({ selectedTab: tab });
+  }
   render() {
-    let { selectedTab } = this.state;
-    let { currentUser, updateUser } = this.props;
     return (
-      <TabBarIOS style={styles.outerContainer}>
+      <TabBarIOS style={globals.flexContainer}>
         <TabBarItemIOS
           title='Activity'
-          selected={ selectedTab == 'Activity' }
+          selected={this.state.selectedTab === 'Activity'}
           iconName='ios-pulse'
-          onPress={() => this.setState({ selectedTab: 'Activity' })}
+          onPress={() => this.setTab('Activity')}
         >
-          <ActivityView {...this.props} updateTab={this.updateTab}/>
+          <ActivityView currentUser={this.props.currentUser} />
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Groups'
-          selected={ selectedTab == 'Groups' }
+          selected={this.state.selectedTab === 'Groups'}
           iconName='ios-people'
-          onPress={() => this.setState({ selectedTab: 'Groups' })}
+          onPress={() => this.setTab('Groups')}
         >
-          <GroupsView {...this.props}/>
+          <GroupsView currentUser={this.props.currentUser} />
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Calendar'
-          selected={ selectedTab == 'Calendar' }
+          selected={this.state.selectedTab === 'Calendar'}
           iconName='ios-calendar'
-          onPress={() => this.setState({ selectedTab: 'Calendar' })}
+          onPress={() => this.setTab('Calendar')}
         >
-          <CalendarView {...this.props}/>
+          <CalendarView currentUser={this.props.currentUser} />
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Messages'
-          selected={ selectedTab == 'Messages' }
+          selected={this.state.selectedTab == 'Messages'}
           iconName='ios-chatboxes'
-          onPress={() => this.setState({ selectedTab: 'Messages' })}
+          onPress={() => this.setTab('Messages')}
         >
-          <MessagesView currentUser={currentUser}/>
+          <MessagesView currentUser={this.props.currentUser} />
         </TabBarItemIOS>
         <TabBarItemIOS
           title='Profile'
-          selected={ selectedTab == 'Profile' }
+          selected={this.state.selectedTab == 'Profile'}
           iconName='ios-person'
-          onPress={() => this.setState({ selectedTab: 'Profile' })}
+          onPress={() => this.setTab('Profile')}
         >
-          <ProfileView currentUser={currentUser} logout={this.logout} updateUser={updateUser}/>
+          <ProfileView
+            updateUser={this.props.updateUser}
+            currentUser={this.props.currentUser}
+            logout={this.logout}
+          />
         </TabBarItemIOS>
       </TabBarIOS>
     );
   }
 };
 
-let styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    backgroundColor: 'white'
-  },
-  backBtn: {
-    paddingTop: 10,
-    paddingHorizontal: 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  h1: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    padding: 20,
-  },
-});
+export default Dashboard;
