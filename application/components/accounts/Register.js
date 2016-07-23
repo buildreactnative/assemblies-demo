@@ -18,15 +18,15 @@ class Register extends Component{
   constructor(){
     super();
     this.goBack = this.goBack.bind(this);
-    this.visitLogin = this.visitLogin.bind(this);
-    this.selectLocation = this.selectLocation.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.selectLocation = this.selectLocation.bind(this);
+    this.visitLogin = this.visitLogin.bind(this);
     this.state = {
       email       : '',
-      password    : '',
       firstName   : '',
       lastName    : '',
-      location    : null
+      location    : null,
+      password    : '',
     }
   }
   goBack(){
@@ -56,9 +56,9 @@ class Register extends Component{
     return (
       <View style={globals.flexContainer}>
         <NavigationBar
-          title={{ title: 'Create Account', tintColor: 'white' }}
-          tintColor={Colors.brandPrimary}
           leftButton={<LeftNavButton handlePress={this.goBack}/>}
+          tintColor={Colors.brandPrimary}
+          title={{ title: 'Create Account', tintColor: 'white' }}
         />
         <KeyboardAwareScrollView style={styles.container}>
           <TouchableOpacity onPress={this.visitLogin}>
@@ -69,75 +69,75 @@ class Register extends Component{
           <Text style={styles.h4}>* Where are you looking for assemblies?</Text>
           <View style={globals.flex}>
             <GooglePlacesAutocomplete
-              styles={autocompleteStyles}
-              placeholder='Your city'
-              minLength={2}
               autoFocus={false}
-              fetchDetails={true}
-              onPress={this.selectLocation}
-              getDefaultValue={() => {return '';}}
-              query={GooglePlacesCityConfig}
               currentLocation={false}
               currentLocationLabel="Current location"
-              nearbyPlacesAPI='GooglePlacesSearch'
-              GoogleReverseGeocodingQuery={{}}
-              GooglePlacesSearchQuery={{rankby: 'distance',}}
+              fetchDetails={true}
               filterReverseGeocodingByTypes={['street_address']}
-              predefinedPlaces={[]}>
+              getDefaultValue={() => {return '';}}
+              GooglePlacesSearchQuery={{rankby: 'distance',}}
+              GoogleReverseGeocodingQuery={{}}
+              minLength={2}
+              nearbyPlacesAPI='GooglePlacesSearch'
+              onPress={this.selectLocation}
+              placeholder='Your city'
+              predefinedPlaces={[]}
+              query={GooglePlacesCityConfig}
+              styles={autocompleteStyles}>
             </GooglePlacesAutocomplete>
           </View>
           <Text style={styles.h4}>* Email</Text>
           <View style={styles.formField}>
             <TextInput
-              returnKeyType="next"
-              onSubmitEditing={() => this.password.focus()}
-              onChangeText={(email) => this.setState({ email })}
-              keyboardType="email-address"
               autoCapitalize="none"
+              keyboardType="email-address"
               maxLength={144}
-              placeholderTextColor={Colors.copyMedium}
-              style={styles.input}
+              onChangeText={(email) => this.setState({ email })}
+              onSubmitEditing={() => this.password.focus()}
               placeholder="Your email address"
+              placeholderTextColor={Colors.copyMedium}
+              returnKeyType="next"
+              style={styles.input}
             />
           </View>
           <Text style={styles.h4}>* Password</Text>
           <View style={styles.formField}>
             <TextInput
-              ref={(el) => this.password = el }
-              returnKeyType="next"
-              onSubmitEditing={() => this.firstName.focus()}
-              onChangeText={(password) => this.setState({ password })}
-              secureTextEntry={true}
               autoCapitalize="none"
               maxLength={20}
-              placeholderTextColor={Colors.copyMedium}
-              style={styles.input}
+              onChangeText={(password) => this.setState({ password })}
+              onSubmitEditing={() => this.firstName.focus()}
               placeholder="Your password"
+              placeholderTextColor={Colors.copyMedium}
+              ref={(el) => this.password = el }
+              returnKeyType="next"
+              secureTextEntry={true}
+              style={styles.input}
             />
           </View>
           <Text style={styles.h4}>* First Name</Text>
           <View style={styles.formField}>
             <TextInput
-              ref={(el) => this.firstName = el }
-              returnKeyType="next"
-              onSubmitEditing={() => this.lastName.focus()}
               maxLength={20}
               onChangeText={(firstName) => this.setState({ firstName })}
-              placeholderTextColor='#bbb'
-              style={styles.input}
+              onSubmitEditing={() => this.lastName.focus()}
               placeholder="Your first name"
+              placeholderTextColor='#bbb'
+              ref={(el) => this.firstName = el }
+              returnKeyType="next"
+              style={styles.input}
             />
           </View>
           <Text style={styles.h4}>* Last name</Text>
           <View style={styles.formField}>
             <TextInput
-              ref={(el) => this.lastName = el }
-              returnKeyType="next"
               maxLength={20}
               onChangeText={(lastName) => this.setState({ lastName })}
-              placeholderTextColor='#bbb'
-              style={styles.input}
               placeholder="Your last name"
+              placeholderTextColor='#bbb'
+              ref={(el) => this.lastName = el }
+              returnKeyType="next"
+              style={styles.input}
             />
          </View>
         </KeyboardAwareScrollView>
