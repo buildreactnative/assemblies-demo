@@ -1,88 +1,65 @@
-import React, { Component } from 'react';
-
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ListView,
-  Image,
-  ActivityIndicator
-} from 'react-native';
-
 import NavigationBar from 'react-native-navbar';
+import React, { Component } from 'react';
+import { Image, ListView, Text, TouchableOpacity, View } from 'react-native';
+import { find } from 'underscore';
+
 import Colors from '../../styles/colors';
 import ConversationRow from './ConversationRow';
+import Loading from '../shared/Loading';
+import { globals, messagesStyles } from '../../styles';
 
-import { messages } from '../../fixtures';
+const styles = messagesStyles;
 
-const Loading = () => (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size='large'/>
-  </View>
-)
-
-export default class Conversations extends Component{
-  _renderRow(rowData){
-    console.log('ROW DATA', rowData);
-    let { users, currentUser, navigator } = this.props;
-    let otherUserId = rowData.user1Id == currentUser.id ? rowData.user2Id : rowData.user1Id;
-    let otherUserIdx = users.map(u => u.id).indexOf(otherUserId);
-    let otherUser = users[otherUserIdx];
+class Conversations extends Component{
+  constructor(){
+    super();
+    this._renderRow = this._renderRow.bind(this);
+    this.dataSource = this.dataSource.bind(this);
+    this.visitConversation = this.visitConversation.bind(this);
+  }
+  visitConversation(user){
+    this.props.navigator.push({
+      name: 'Conversation',
+      user
+    })
+  }
+  _renderRow(conversation){
+    let otherUserID = find([conversation.user1Id, conversation.user2Id], (id) => id !== this.props.currentUser.id);
+    let otherUser = find(this.props.users, ({ id }) => id === otherUserID);
     return (
       <ConversationRow
-        conversation={rowData}
+        conversation={conversation}
+        handlePress={() => this.visitConversation(otherUser)}
         user={otherUser}
-        handlePress={() => {
-          navigator.push({
-            name: 'Conversation',
-            conversation: rowData,
-            user: otherUser
-          });
-        }}
       />
     );
   }
-  render() {
-    let { conversations, users, ready } = this.props;
-    if (! ready ) { return <Loading /> }
+  dataSource(){
     return (
-      <View style={{ flex: 1 }}>
+      new ListView.DataSource({
+        rowHasChanged: (r1,r2) => r1 != r2
+      })
+      .cloneWithRows(this.props.conversations)
+    );
+  }
+  render() {
+    if (! this.props.ready ) { return <Loading /> }
+    return (
+      <View style={globals.flex}>
         <NavigationBar
           title={{ title: 'Messages', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
         />
         <ListView
-          dataSource={new ListView.DataSource({
-              rowHasChanged: (r1,r2) => r1 != r2
-            })
-            .cloneWithRows(conversations)
-          }
+          dataSource={this.dataSource()}
           enableEmptySections={true}
           contentInset={{ bottom: 49 }}
           automaticallyAdjustContentInsets={false}
-          ref='messagesList'
-          renderRow={this._renderRow.bind(this)}
+          renderRow={this._renderRow}
         />
       </View>
     );
   }
 };
 
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  h1: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    padding: 20,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});
+export default Conversations;

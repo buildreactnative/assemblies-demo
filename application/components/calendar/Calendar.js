@@ -2,22 +2,13 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ListView,
-  TouchableOpacity,
-  Dimensions
-} from 'react-native';
+import { View, Text, ListView, TouchableOpacity } from 'react-native';
 import { uniq, flatten, find } from 'underscore';
 
-import Loading from '../utilities/Loading';
+import Loading from '../shared/Loading';
 import { globals, calendarStyles } from '../../styles';
 
 const styles = calendarStyles;
-
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 const EmptyList = ({ ready }) => {
   if (! ready ) { return <Loading /> }

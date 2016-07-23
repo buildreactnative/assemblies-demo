@@ -14,7 +14,7 @@ import {
 
 import Dashboard from './application/components/Dashboard';
 import Landing from './application/components/Landing';
-import Loading from './application/components/utilities/Loading';
+import Loading from './application/components/shared/Loading';
 import Login from './application/components/accounts/Login';
 import Register from './application/components/accounts/Register';
 import RegisterConfirm from './application/components/accounts/RegisterConfirm';

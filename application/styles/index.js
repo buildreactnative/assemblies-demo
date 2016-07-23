@@ -3,6 +3,10 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
+export const messagesStyles = {
+
+};
+
 export const calendarStyles = {
   h2: {
     fontSize: 18,
@@ -70,6 +74,7 @@ export const activityStyles = {
   dateText: {
     fontSize: 14,
     paddingBottom: 4,
+    paddingHorizontal: 10,
     fontWeight: '300',
     fontStyle: 'italic',
     color: Colors.bodyText,
