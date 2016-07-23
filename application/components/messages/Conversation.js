@@ -3,330 +3,126 @@ import InvertibleScrollView from 'react-native-invertible-scroll-view';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Dimensions
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native';
 
 import Colors from '../../styles/colors';
-import Globals from '../../styles/globals';
+import Headers from '../../fixtures/headers';
 import LeftNavButton from '../shared/LeftNavButton';
 import { DEV, API } from '../../config';
+import { globals, messagesStyles } from '../../styles';
 
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
+const styles = messagesStyles;
 
-const Message = ({ user, message, navigator }) => {
+const Message = ({ user, message }) => {
   return (
-    <View style={messageStyles.container}>
-      <TouchableOpacity>
-        <Image
-          style={messageStyles.icon}
-          source={{uri: user.avatar? user.avatar : DefaultAvatar }}
-        />
-      </TouchableOpacity>
-      <View style={messageStyles.messageBox}>
-        <View style={messageStyles.row}>
-          <Text style={messageStyles.author}>{`${user.firstName} ${user.lastName}`}</Text>
-          <Text style={messageStyles.sent}>{moment(new Date(message.createdAt)).fromNow()}</Text>
+    <View style={[globals.centeredRow, globals.pt1]}>
+      <View>
+        <Image style={globals.avatar} source={{uri: user.avatar? user.avatar : DefaultAvatar }} />
+      </View>
+      <View style={[styles.flexCentered, globals.pv1]}>
+        <View style={globals.flexRow}>
+          <Text style={styles.h5}>{`${user.firstName} ${user.lastName}`}</Text>
+          <Text style={styles.h6}>{moment(new Date(message.createdAt)).fromNow()}</Text>
         </View>
-        <View style={messageStyles.messageView}>
-          <Text style={messageStyles.messageText}>{message.text}</Text>
+        <View style={globals.flexContainer}>
+          <Text style={styles.messageText}>{message.text}</Text>
         </View>
       </View>
     </View>
   )
 };
 
-export default class Conversation extends Component{
+class Conversation extends Component{
   constructor(){
     super();
+    this.goBack = this.goBack.bind(this);
     this.createMessage = this.createMessage.bind(this);
     this.state = {
-      msg: '',
-      messages: []
+      messages  : [],
+      message   : '',
     }
   }
-  _loadMessages(userId){
+  componentWillMount(){
+    this._loadMessages();
+  }
+  _loadMessages(){
     let { user, currentUser } = this.props;
     console.log('USER IDS', user.id, currentUser.id);
     let query = {
-      "$or": [
-        { "senderId": userId, "recipientId": currentUser.id },
-        { "recipientId": userId, "senderId": currentUser.id }
+      $or: [
+        { senderId    : user.id, recipientId  : currentUser.id },
+        { recipientId : user.id, senderId     : currentUser.id }
       ],
-      "$sort": { "createdAt": -1 },
-      "$limit": 10
-    }
-    let url = `${API}/messages?${JSON.stringify(query)}`;
-    console.log('URL', url);
-    fetch(url)
+      $sort: { createdAt: -1 },
+      $limit: 10
+    };
+    fetch(`${API}/messages?${JSON.stringify(query)}`)
     .then(response => response.json())
     .then(messages => this.setState({ messages }))
     .catch(err => console.log('ERR:', err))
     .done();
   }
-  componentWillReceiveProps({user}){
-    if (user.id !== this.props.user.id){
-      this._loadMessages(user.id);
-    }
-  }
-  componentWillMount(){
-    this._loadMessages(this.props.user.id);
-  }
+
   createMessage(){
-    /* TODO: create message */
-    let { msg } = this.state;
     let { currentUser, user } = this.props;
     fetch(`${API}/messages`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: Headers,
       body: JSON.stringify({
-        senderId: currentUser.id,
-        recipientId: user.id,
-        text: msg,
-        createdAt: new Date().valueOf(),
+        senderId      : currentUser.id,
+        recipientId   : user.id,
+        text          : this.state.message,
+        createdAt     : new Date().valueOf(),
       })
     })
     .then(response => response.json())
-    .then(data => {
-      console.log('DATA', data);
-      this.setState({ msg: '', messages: [ data, ...this.state.messages ]})
-    })
-    .catch(err => console.log('ERR:', err))
+    .then(data => this.setState({ message: '', messages: [ data, ...this.state.messages ]}) )
+    .catch(err => {})
     .done();
   }
+  goBack(){
+    this.props.navigator.pop();
+  }
   render(){
-    let { user, navigator, currentUser } = this.props;
-    let { msg, messages } = this.state;
-    let titleConfig = { title: `${user.firstName} ${user.lastName}`, tintColor: 'white' };
+    let { user, currentUser } = this.props;
     return(
-      <View style={styles.container}>
-        <InvertibleScrollView
-          inverted={true}
-          style={styles.scrollView}
-          ref="scroll">
-          {messages.map((msg, idx) => (
+      <View style={globals.flexContainer}>
+        <InvertibleScrollView inverted={true}>
+          {this.state.messages.map((msg, idx) => (
             <Message
+              key={idx}
               message={msg}
               user={msg.senderId === currentUser.id ? currentUser : user}
-              key={idx}
-              navigator={navigator}
             />
           ))}
         </InvertibleScrollView>
         <View style={styles.navContainer}>
           <NavigationBar
-            ref='nav'
             tintColor={Colors.brandPrimary}
-            title={titleConfig}
-            leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
+            title={{ title: `${user.firstName} ${user.lastName}`, tintColor: 'white' }}
+            leftButton={<LeftNavButton handlePress={this.goBack}/>}
           />
         </View>
         <View style={styles.inputBox}>
           <TextInput
             multiline={true}
-            value={this.state.msg}
+            value={this.state.message}
             placeholder='Say something...'
             placeholderTextColor={Colors.bodyTextLight}
-            onChange={(e) => this.setState({msg: e.nativeEvent.text})}
+            onChangeText={(msg) => this.setState({ message })}
             style={styles.input}
           />
           <TouchableOpacity
-            style={ msg ? styles.buttonActive : styles.buttonInactive }
+            style={ this.state.message ? styles.buttonActive : styles.buttonInactive }
             underlayColor='#D97573'
             onPress={this.createMessage}>
-            <Text style={ msg ? styles.submitButtonText : styles.inactiveButtonText }>Send</Text>
+            <Text style={ this.state.message ? styles.submitButtonText : styles.inactiveButtonText }>Send</Text>
           </TouchableOpacity>
         </View>
-        <KeyboardSpacer topSpacing={-50} ref='space'/>
+        <KeyboardSpacer topSpacing={-50} />
       </View>
     )
   }
 };
 
-let messageStyles = StyleSheet.create({
-  container:{
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingVertical: 10,
-    backgroundColor: 'white',
-  },
-  scrollView: {
-    marginTop: 50,
-  },
-  icon: {
-    marginTop: 10,
-    marginLeft: 13,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  messageBox: {
-    flex: 1,
-    alignItems: 'stretch',
-    padding: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 2,
-    marginTop: 10
-  },
-  messageView: {
-    backgroundColor: 'white',
-    flex: 1,
-    paddingRight: 15
-  },
-  messageText: {
-    fontSize: 16,
-    fontWeight: '300',
-  },
-  author:{
-    fontSize: 12,
-    fontWeight: '700'
-  },
-  sent:{
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#9B9B9B',
-    marginLeft: 10,
-    color: '#9B9B9B',
-    fontWeight: '300',
-    marginLeft: 10
-  }
-})
-
-let styles = StyleSheet.create({
-  navContainer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    left: 0,
-    height: 50,
-  },
-  inputBox: {
-    marginBottom: 50,
-    height: 60,
-    left: 0,
-    right: 0,
-    backgroundColor: '#F3EFEF',
-    backgroundColor: Colors.inactive,
-    flexDirection: 'row',
-  },
-  input: {
-    height: 40,
-    padding: 8,
-    flex: 1,
-    marginRight: 5,
-    fontSize: 14,
-    borderColor: '#E0E0E0',
-    margin: 10,
-    borderColor: '#b4b4b4',
-    borderRadius: 8,
-    color: Colors.bodyText,
-    backgroundColor: 'white',
-  },
-  buttonActive: {
-    flex: 0.4,
-    backgroundColor: "#E0514B",
-    backgroundColor: Colors.brandPrimary,
-    borderRadius: 6,
-    justifyContent: 'center',
-    margin: 10,
-  },
-  buttonInactive: {
-    flex: 0.4,
-    backgroundColor: "#eeeeee",
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    borderRadius: 6,
-    justifyContent: 'center',
-    margin: 10,
-  },
-  buttonText: {
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 16,
-  },
-  centering: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: deviceHeight,
-  },
-  sentText:{
-    fontSize: 14,
-    padding: 10,
-    marginRight: 15,
-    fontWeight: '300',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 20,
-  },
-  backButtonText: {
-    color: 'white',
-  },
-  fromContainer:{
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  fromText:{
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  messageTextContainer:{
-    flex: 1,
-  },
-  messageText:{
-    fontSize: 18,
-    fontWeight: '300',
-    paddingHorizontal: 15,
-  },
-  messageContainer:{
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profile:{
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginHorizontal: 10,
-    marginVertical: 10,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'white'
-  },
-  header: {
-    height: 70,
-    backgroundColor: Colors.brandPrimary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerText: {
-    color: 'white',
-    fontSize: 22,
-  },
-  submitButtonText: {
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '400',
-    color: 'white',
-  },
-  inactiveButtonText: {
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#999'
-  }
-});
+export default Conversation;

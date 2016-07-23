@@ -22,6 +22,10 @@ export const messagesStyles = {
     fontStyle: 'italic',
     fontWeight: '300',
   },
+  messageText: {
+    fontSize: 16,
+    fontWeight: '300'
+  },
   arrowContainer: {
     flex: 0.5,
     alignItems: 'flex-end',
@@ -32,6 +36,74 @@ export const messagesStyles = {
     borderBottomWidth: 1,
     height: 0,
     width: deviceWidth * 0.95,
+  },
+  navContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    left: 0,
+    height: 50,
+  },
+  inputBox: {
+    marginBottom: 50,
+    height: 60,
+    left: 0,
+    right: 0,
+    backgroundColor: '#F3EFEF',
+    backgroundColor: Colors.inactive,
+    flexDirection: 'row',
+  },
+  input: {
+    height: 40,
+    padding: 8,
+    flex: 1,
+    marginRight: 5,
+    fontSize: 14,
+    borderColor: '#E0E0E0',
+    margin: 10,
+    borderColor: '#b4b4b4',
+    borderRadius: 8,
+    color: Colors.bodyText,
+    backgroundColor: 'white',
+  },
+  buttonActive: {
+    flex: 0.4,
+    backgroundColor: "#E0514B",
+    backgroundColor: Colors.brandPrimary,
+    borderRadius: 6,
+    justifyContent: 'center',
+    margin: 10,
+  },
+  buttonInactive: {
+    flex: 0.4,
+    backgroundColor: "#eeeeee",
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 6,
+    justifyContent: 'center',
+    margin: 10,
+  },
+  buttonText: {
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 16,
+  },
+  submitButtonText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '400',
+    color: 'white',
+  },
+  inactiveButtonText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#999'
+  },
+  flexCentered: {
+    flex: 1,
+    justifyContent: 'center',
+    marginTop: 8
   }
 };
 
@@ -408,5 +480,11 @@ export const globals = StyleSheet.create({
     borderRadius: 25,
     marginHorizontal: 10,
     marginVertical: 10,
-  }
+  },
+  centeredRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
