@@ -23,7 +23,60 @@ export const landingStyles = StyleSheet.create({
     height: 90,
     width: 90
   },
+
 });
+
+export const formStyles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.inactive,
+    flex: 1,
+    paddingVertical: 15
+  },
+  h3: {
+    fontWeight: '400',
+    fontSize: 22,
+    textAlign: 'center',
+    color: Colors.copyLight,
+    paddingVertical: 10,
+    paddingHorizontal: 20
+  },
+  h4: {
+    fontSize: 20,
+    fontWeight: '300',
+    color: Colors.copyDark,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+  errorContainer: {
+    paddingHorizontal: 15,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: Colors.red
+  },
+
+  formField: {
+    backgroundColor: 'white',
+    height: 50,
+    paddingTop: 5,
+    marginBottom: 10,
+  },
+  input: {
+    color: Colors.copyLight,
+    fontSize: 18,
+    fontWeight: '300',
+    height: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+  submitButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.brandPrimary,
+    height: 70,
+  }
+})
 
 export const globals = StyleSheet.create({
   flex: {
@@ -78,6 +131,11 @@ export const globals = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '700',
+  },
+  largeButtonText: {
+    fontSize: 24,
+    fontWeight: '400',
+    color: 'white'
   },
   brandPrimary: {
     backgroundColor: Colors.brandPrimary
