@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
-import {
-  Navigator,
-  StyleSheet
-} from 'react-native';
+import { Navigator } from 'react-native';
+
 import UserProfile from './UserProfile';
 import UserSettings from './UserSettings';
 import UserTechnologies from './UserTechnologies';
+import { globals } from '../../styles';
 
-export default class ProfileView extends Component{
+class ProfileView extends Component{
   render(){
     return (
       <Navigator
         initialRoute={{ name: 'UserProfile' }}
-        style={styles.container}
+        style={globals.flex}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'UserProfile':
@@ -44,10 +43,6 @@ export default class ProfileView extends Component{
       />
     )
   }
-}
+};
 
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  }
-});
+export default ProfileView;
