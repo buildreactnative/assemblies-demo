@@ -1,68 +1,60 @@
 import React, { Component } from 'react';
-import {
-  Navigator,
-  StyleSheet
-} from 'react-native';
+import { Navigator } from 'react-native';
 
-import Conversation from '../messages/Conversation';
 import Activity from './Activity';
+import Conversation from '../messages/Conversation';
 import Event from '../groups/Event';
 import Profile from '../profile/Profile';
 import { API, DEV } from '../../config';
+import { globals } from '../../styles';
 
 class ActivityView extends Component{
   constructor(){
     super();
     this.state = {
-      notifications: [],
-      nextEvents: [],
+      nextEvents      : [],
+      notifications   : [],
     }
   }
   componentDidMount(){
-    let { currentUser } = this.props;
+    this._loadNotifications();
+  }
+  _loadNotifications(){
     let query = {
       participants: {
         $elemMatch: {
-          userId: currentUser.id
+          userId: this.props.currentUser.id
         }
       }
     };
     fetch(`${API}/notifications?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(notifications => {
-      this.setState({ notifications });
-      let eventQuery = {
-        $or: [
-          {
-            $elemMatch: {
-              going: currentUser.id
-            },
-            start: { $gt: new Date().valueOf() }
-          },
-          {
-            'location.city.long_name': currentUser.location.city.long_name,
-            start: { $gt: new Date().valueOf() }
-          }
-        ]
-      };
-      let sort = {
-        sort: { createdAt: 1 },
-        limit: 1
-      }
-      fetch(`${API}/events?${eventQuery}${sort}`)
-      .then(response => response.json())
-      .then(events => this.setState({ nextEvents: events }))
-      .catch(err => console.log('FETCH EVENTS ERROR: ', err))
-      .done();
-    })
-    .catch(err => console.log('FETCH NOTIFICATIONS ERROR: ', err))
+    .then(notifications => this._loadNextEvent(notifications))
+    .catch(err => {})
+    .done();
+  }
+  _loadNextEvent(notifications){
+    this.setState({ notifications });
+    let dateQuery = { end: { $gt: new Date().valueOf() }};
+    let query = {
+      $or: [
+        extend(dateQuery, { $elemMatch: { going: this.props.curentUser.id }}),
+        extend(dateQuery, { 'location.city.long_name': this.props.currentUser.location.city.long_name })
+      ],
+      $limit: 1,
+      $sort: { createdAt: 1 }
+    };
+    fetch(`${API}/events?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(nextEvents => this.setState({ nextEvents }))
+    .catch(err => {})
     .done();
   }
   render(){
     return (
       <Navigator
-        style={styles.container}
-        initialRoute={{name: 'Activity'}}
+        style={globals.flex}
+        initialRoute={{ name: 'Activity' }}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'Activity':
@@ -105,11 +97,5 @@ class ActivityView extends Component{
     )
   }
 }
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-})
 
 export default ActivityView;
