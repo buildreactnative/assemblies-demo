@@ -19,6 +19,7 @@ import Login from './application/components/accounts/Login';
 import Register from './application/components/accounts/Register';
 import RegisterConfirm from './application/components/accounts/RegisterConfirm';
 import { API, DEV } from './application/config';
+import { extend } from 'underscore';
 import Headers from './application/fixtures/headers';
 
 class assemblies extends Component {
@@ -37,27 +38,28 @@ class assemblies extends Component {
   async _loadLoginCredentials(){ /* fetch session id from AsyncStorage to enable persistent user login */
     try {
       let sid = await AsyncStorage.getItem('sid');
+      console.log('SID', sid);
       if (sid) {
         this.fetchUser(sid);
       } else {
         this.ready();
       }
     } catch (err) {
-      this.ready();
+      this.ready(err);
     }
   }
-  ready(){ /* render screen */
+  ready(err){ /* render screen */
     this.setState({ ready: true })
   }
   fetchUser(sid){ /* fetch user with session id */
     fetch(`${API}/users/me`, { headers: extend(Headers, { 'Set-Cookie': `sid=${sid}`}) })
     .then(response => response.json())
     .then(user => this.setState({ user, ready: true, initialRoute: 'Dashboard' }))
-    .catch(err => this.ready())
+    .catch(err => this.ready(err))
     .done();
   }
   updateUser(user){
-    this.setState({ user: user });
+    this.setState({ user });
     if (!user) this.nav.push({ name: 'Landing' })
   }
   render() {

@@ -18,7 +18,7 @@ import NavigationBar from 'react-native-navbar';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { extend, find, range } from 'underscore';
 import { autocompleteStyles } from '../accounts/Register';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import moment from 'moment';
 import Config from 'react-native-config';
 import { API, DEV } from '../../config';
@@ -74,7 +74,7 @@ class CreateEvent extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
         />
         <ScrollView style={styles.formContainer} contentContainerStyle={styles.scrollViewContainer}>
           <Text style={styles.h4}>{"* When does the event start?"}</Text>

@@ -15,7 +15,7 @@ import {
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import { DEV, API } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -126,7 +126,7 @@ export default class Conversation extends Component{
             ref='nav'
             tintColor={Colors.brandPrimary}
             title={titleConfig}
-            leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+            leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
           />
         </View>
         <View style={styles.inputBox}>

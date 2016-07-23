@@ -4,12 +4,12 @@ import NavigationBar from 'react-native-navbar';
 import Dropdown, { Select, Option, OptionList } from 'react-native-selectme';
 import React, { Component } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
   AsyncStorage,
-  TouchableOpacity,
   Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { uniq, extend } from 'underscore';
 

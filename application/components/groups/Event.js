@@ -17,7 +17,7 @@ import {
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import { API, DEV } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -131,7 +131,7 @@ class Event extends Component{
         <NavigationBar
           title={{title: event.name, tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
         />
         <ScrollView style={styles.scrollView}>
           <EventMap location={event.location} going={event.going} ready={ready}/>

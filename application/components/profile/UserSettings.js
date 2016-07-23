@@ -18,7 +18,7 @@ import { autocompleteStyles } from '../accounts/Register';
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import {DEV, API} from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -67,7 +67,7 @@ class UserSettings extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
         />
         <KeyboardAwareScrollView style={styles.formContainer}>
           <Text style={styles.h4}>{"* Where are you looking for assemblies?"}</Text>

@@ -21,7 +21,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import {DEV, API} from '../../config';
 import { Technologies } from '../../fixtures';
 import { selectStyles, optionTextStyles, overlayStyles, TechnologyList } from '../accounts/RegisterConfirm';
@@ -77,7 +77,7 @@ class UserTechnologies extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
         />
         <KeyboardAwareScrollView style={styles.formContainer}>
           <View style={{ flex: 1 }}>

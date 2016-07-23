@@ -1,70 +1,67 @@
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  View,
-  Navigator,
-  Dimensions
-} from 'react-native';
-import Conversations from './Conversations';
+import { Navigator } from 'react-native';
+import { flatten, uniq } from 'underscore';
+
 import Conversation from './Conversation';
+import Conversations from './Conversations';
 import UserProfile from '../profile/UserProfile';
 import { DEV, API } from '../../config';
-import _ from 'underscore';
+import { globals } from '../../styles';
 
-export default class MessagesView extends Component{
+class MessagesView extends Component{
   constructor(){
     super();
     this.state = {
-      conversations: [],
-      users: [],
-      ready: false,
+      conversations : [],
+      ready         : false,
+      users         : [],
     }
   }
-  componentDidMount(){
+  _loadConversations(){
     let { currentUser } = this.props;
-    let conversationQuery = {
-      "$or": [
-        {"user1Id": currentUser.id},
-        {"user2Id": currentUser.id}
-      ]
+    let query = { /* check conversations with that include the current user */
+      $or: [
+        {user1Id: currentUser.id},
+        {user2Id: currentUser.id}
+      ],
+      $limit: 10, $sort: { lastMessageDate: -1 }
     };
-    fetch(`${API}/conversations?${conversationQuery}`)
+    let params = {  };
+    fetch(`${API}/conversations?${JSON.stringify(query)}`)
     .then(response => response.json())
-    .then(conversations => {
-      let userIds = _.uniq(_.flatten(conversations.map(d => ([d.user1Id, d.user2Id]))));
-      console.log('USER IDS', userIds);
-      let userQuery = {
-        "id": { "$in": userIds }
-      };
-      fetch(`${API}/users?${userQuery}`)
-      .then(response => response.json())
-      .then(users => this.setState({ conversations, users, ready: true }))
-      .catch(err => { console.log('ERR: ', err)})
-    })
-    .catch(err => {
-      console.log('ERR:', err);
-      this.setState({ ready: true })
-    })
+    .then(conversations => this._loadUsers(conversations))
+    .catch(err => this.ready(err))
+    .done();
+  }
+  _loadUsers(conversations){
+    let userIds = uniq(flatten(conversations.map(cn => [cn.user1Id, cn.user2Id])));
+    let query = { id: { $in: userIds }};
+    fetch(`${API}/users?${query}`)
+    .then(response => response.json())
+    .then(users => this.setState({ conversations, users, ready: true }))
+    .catch(err => this.ready(err))
+    .done();
+  }
+  ready(err){
+    this.setState({ ready: true })
+  }
+  componentDidMount(){
+    this._loadConversations();
   }
   render(){
-    let { conversations, users } = this.state;
     return (
       <Navigator
-        style={styles.container}
-        initialRoute={{
-          name: 'Conversations'
-        }}
+        style={globals.flex}
+        initialRoute={{ name: 'Conversations' }}
         renderScene={(route, navigator) => {
           switch(route.name){
             case 'Conversations':
               return (
                 <Conversations
                   {...this.props}
-                  {...this.state}
                   {...route}
-                  conversations={conversations}
+                  {...this.state}
                   navigator={navigator}
-                  users={users}
                 />
               );
             case 'Conversation':
@@ -77,7 +74,11 @@ export default class MessagesView extends Component{
               );
             case 'Profile':
               return (
-                <Profile user={route.user} />
+                <Profile
+                  {...this.props}
+                  {...route}
+                  navigator={navigator}
+                />
               );
           }
         }}
@@ -86,8 +87,4 @@ export default class MessagesView extends Component{
   }
 };
 
-let styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-})
+export default MessagesView;

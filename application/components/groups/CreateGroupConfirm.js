@@ -21,7 +21,7 @@ import {
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import { API, DEV } from '../../config';
 import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
 
@@ -139,7 +139,7 @@ class CreateGroupConfirm extends Component{
         <NavigationBar
           title={titleConfig}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
         />
         <ScrollView
           style={styles.formContainer}>

@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { find } from 'underscore';
 
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import { API, DEV } from '../../config';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -215,7 +215,7 @@ class Group extends Component{
         <NavigationBar
           title={{title: group.name, tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.replacePreviousAndPop({name: 'Groups'})}/>}
+          leftButton={<LeftNavButton handlePress={() => navigator.replacePreviousAndPop({name: 'Groups'})}/>}
           rightButton={<OptionsButton openActionSheet={this.openActionSheet}/>}
         />
         <ScrollView style={styles.scrollView}>

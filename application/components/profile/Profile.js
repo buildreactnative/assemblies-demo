@@ -15,7 +15,7 @@ import {
 import Colors from '../../styles/colors';
 import NavigationBar from 'react-native-navbar';
 import {API, DEV} from '../../config';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 
 let { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -85,7 +85,7 @@ class Profile extends React.Component{
         <NavigationBar
           tintColor={Colors.brandPrimary}
           title={titleConfig}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/> }
+          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/> }
         />
         <ScrollView style={styles.profileContainer}>
           <View style={{height: 120, alignItems: 'center'}}>

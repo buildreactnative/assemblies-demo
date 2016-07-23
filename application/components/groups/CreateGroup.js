@@ -16,7 +16,7 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from '../accounts/LeftButton';
+import LeftNavButton from '../shared/LeftNavButton';
 import { autocompleteStyles } from '../accounts/Register';
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
@@ -56,7 +56,7 @@ class CreateGroup extends Component{
   render(){
     let { navigator } = this.props;
     let titleConfig = {title: 'Create Assembly', tintColor: 'white'}
-    let leftButtonConfig = <LeftButton handlePress={() => navigator.pop()}/>
+    let leftButtonConfig = <LeftNavButton handlePress={() => navigator.pop()}/>
     return (
       <View style={styles.container}>
         <NavigationBar
