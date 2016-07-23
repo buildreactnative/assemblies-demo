@@ -39,7 +39,7 @@ class Landing extends Component{
         </View>
         <TouchableOpacity style={[globals.button, globals.inactive, styles.loginButton]} onPress={this.visitLogin}>
           <Icon name='lock' size={36} color={Colors.brandPrimary} />
-          <Text style={[globals.buttonText, globals.darkText]}>Login</Text>
+          <Text style={[globals.buttonText, globals.primaryText]}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity style={globals.button} onPress={this.visitRegister}>
           <Icon name='person' size={36} color='white' />

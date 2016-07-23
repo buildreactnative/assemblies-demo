@@ -1,309 +1,152 @@
-import _ from 'underscore';
-import Config from 'react-native-config';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import React, { Component } from 'react';
-import {
-  Text,
-  View,
-  ScrollView,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions
-} from 'react-native';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { extend, find } from 'underscore';
 
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
-import LeftButton from './LeftButton';
-import {DEV} from '../../config';
+import LeftNavButton from '../shared/LeftNavButton';
+import { DEV, GooglePlacesCityConfig } from '../../config';
+import { formStyles, autocompleteStyles, globals } from '../../styles';
 
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
-
+const styles = formStyles;
 
 class Register extends Component{
   constructor(){
     super();
+    this.goBack = this.goBack.bind(this);
+    this.visitLogin = this.visitLogin.bind(this);
+    this.selectLocation = this.selectLocation.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: '',
-      location: null
+      email       : '',
+      password    : '',
+      firstName   : '',
+      lastName    : '',
+      location    : null
     }
   }
+  goBack(){
+    this.props.navigator.pop();
+  }
+  visitLogin(){
+    this.props.navigator.push({ name: 'Login' })
+  }
+  selectLocation(data, details){
+    if ( ! details ) { return; }
+    let location = {
+      ...details.geometry.location,
+      city: find(details.address_components, (c) => c.types[0] === 'locality'),
+      state: find(details.address_components, (c) => c.types[0] === 'administrative_area_level_1'),
+      county: find(details.address_components, (c) => c.types[0] === 'administrative_area_level_2'),
+      formattedAddress: details.formatted_address
+    };
+    this.setState({ location });
+  }
+  handleSubmit(){
+    this.props.navigator.push({
+      name: 'RegisterConfirm',
+      ...this.state
+    })
+  }
   render(){
-    let { navigator } = this.props;
-    let titleConfig = { title: 'Create Account', tintColor: 'white' };
     return (
-      <View style={styles.container}>
+      <View style={globals.flexContainer}>
         <NavigationBar
-          title={titleConfig}
+          title={{ title: 'Create Account', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={this.goBack}/>}
         />
-        <KeyboardAwareScrollView style={styles.formContainer}>
-          <TouchableOpacity onPress={()=> navigator.push({ name: 'Login' })}>
+        <KeyboardAwareScrollView style={styles.container}>
+          <TouchableOpacity onPress={this.visitLogin}>
             <Text style={styles.h5}>
-              Already have an account? <Text style={styles.technologyList}>Login</Text>
+              Already have an account? <Text style={[styles.h5, globals.primaryText]}>Login</Text>
             </Text>
           </TouchableOpacity>
-          <Text style={styles.h4}>{"* Where are you looking for assemblies?"}</Text>
-          <View ref="location" style={{flex: 1,}}>
+          <Text style={styles.h4}>* Where are you looking for assemblies?</Text>
+          <View style={globals.flex}>
             <GooglePlacesAutocomplete
               styles={autocompleteStyles}
               placeholder='Your city'
               minLength={2}
               autoFocus={false}
               fetchDetails={true}
-              onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                if (DEV) {console.log(data);}
-                if (DEV) {console.log(details);}
-                this.setState({
-                  location: _.extend({}, details.geometry.location, {
-                    city: _.find(details.address_components, (c) => c.types[0] == 'locality'),
-                    state: _.find(details.address_components, (c) => c.types[0] == 'administrative_area_level_1'),
-                    county: _.find(details.address_components, (c) => c.types[0] == 'administrative_area_level_2'),
-                    formattedAddress: details.formatted_address,
-                  })
-                });
-              }}
+              onPress={this.selectLocation}
               getDefaultValue={() => {return '';}}
-              query={{
-                key       :  Config.GOOGLE_PLACES_API_KEY,
-                language  : 'en', // language of the results
-                types     : '(cities)', // default: 'geocode'
-              }}
+              query={GooglePlacesCityConfig}
               currentLocation={false}
               currentLocationLabel="Current location"
               nearbyPlacesAPI='GooglePlacesSearch'
               GoogleReverseGeocodingQuery={{}}
               GooglePlacesSearchQuery={{rankby: 'distance',}}
-              filterReverseGeocodingByTypes={['street_address']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+              filterReverseGeocodingByTypes={['street_address']}
               predefinedPlaces={[]}>
             </GooglePlacesAutocomplete>
           </View>
-
           <Text style={styles.h4}>* Email</Text>
-
-          <View ref="email" style={styles.formField}>
+          <View style={styles.formField}>
             <TextInput
-              ref="emailField"
               returnKeyType="next"
-              onSubmitEditing={() => this.refs.passwordField.focus()}
-              onChangeText={(text) => this.setState({email: text})}
+              onSubmitEditing={() => this.password.focus()}
+              onChangeText={(email) => this.setState({ email })}
               keyboardType="email-address"
               autoCapitalize="none"
               maxLength={144}
-              placeholderTextColor='#bbb'
+              placeholderTextColor={Colors.copyMedium}
               style={styles.input}
               placeholder="Your email address"
             />
           </View>
           <Text style={styles.h4}>* Password</Text>
-
-          <View style={styles.formField} ref="password">
+          <View style={styles.formField}>
             <TextInput
-              ref="passwordField"
+              ref={(el) => this.password = el }
               returnKeyType="next"
-              onSubmitEditing={() => this.refs.firstNameField.focus()}
-              onChangeText={(text) => this.setState({password: text})}
+              onSubmitEditing={() => this.firstName.focus()}
+              onChangeText={(password) => this.setState({ password })}
               secureTextEntry={true}
               autoCapitalize="none"
               maxLength={20}
-              placeholderTextColor='#bbb'
+              placeholderTextColor={Colors.copyMedium}
               style={styles.input}
               placeholder="Your password"
             />
           </View>
           <Text style={styles.h4}>* First Name</Text>
-          <View style={styles.formField} ref="firstName">
+          <View style={styles.formField}>
             <TextInput
-              ref="firstNameField"
+              ref={(el) => this.firstName = el }
               returnKeyType="next"
-              onSubmitEditing={() => this.refs.lastNameField.focus()}
+              onSubmitEditing={() => this.lastName.focus()}
               maxLength={20}
-              onChangeText={(text) => this.setState({ firstName: text})}
+              onChangeText={(firstName) => this.setState({ firstName })}
               placeholderTextColor='#bbb'
               style={styles.input}
               placeholder="Your first name"
             />
           </View>
           <Text style={styles.h4}>* Last name</Text>
-          <View style={styles.formField} ref="lastName">
+          <View style={styles.formField}>
             <TextInput
+              ref={(el) => this.lastName = el }
               returnKeyType="next"
               maxLength={20}
-              ref="lastNameField"
-              onChangeText={(text) => this.setState({lastName: text})}
+              onChangeText={(lastName) => this.setState({ lastName })}
               placeholderTextColor='#bbb'
               style={styles.input}
               placeholder="Your last name"
             />
          </View>
         </KeyboardAwareScrollView>
-        <TouchableOpacity style={Globals.submitButton} onPress={()=>{
-          this.props.navigator.push({
-            name: 'RegisterConfirm',
-            email: this.state.email,
-            password: this.state.password,
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            location: this.state.location,
-          })
-        }}>
+        <TouchableOpacity  style={styles.submitButton} onPress={this.handleSubmit}>
           <Text style={Globals.submitButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     )
   }
 }
-
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backButton: {
-    paddingLeft: 20,
-    backgroundColor: 'transparent',
-    paddingBottom: 10,
-  },
-  technologyList:{
-    textAlign: 'left',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.brandPrimary,
-    paddingHorizontal: 20,
-    marginLeft: 8,
-    paddingVertical: 4,
-  },
-  formContainer: {
-    backgroundColor: Colors.inactive,
-    flex: 1,
-    paddingTop: 15,
-  },
-  contentContainerStyle: {
-    flex: 1,
-  },
-  h4: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'black',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  h5: {
-    fontSize: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    textAlign: 'center',
-  },
-  formField: {
-    backgroundColor: 'white',
-    height: 50,
-    paddingTop: 5,
-    marginBottom: 10,
-  },
-  largeFormField: {
-    backgroundColor: 'white',
-    height: 100,
-  },
-  addPhotoContainer: {
-    backgroundColor: 'white',
-    marginVertical: 15,
-      marginHorizontal: (deviceWidth - 200) / 2,
-    width: 200,
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoText: {
-    fontSize: 18,
-    paddingHorizontal: 10,
-    color: Colors.brandPrimary
-  },
-  input: {
-    color: '#777',
-    fontSize: 18,
-    fontWeight: '300',
-    height: 40,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  pb: {
-    paddingBottom: 10,
-  },
-  largeInput: {
-    color: '#ccc',
-    fontSize: 18,
-    backgroundColor: 'white',
-    fontWeight: '300',
-    height: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-});
-
-export const autocompleteStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  textInputContainer: {
-    backgroundColor: 'white',
-    height: 44,
-    borderTopColor: 'white',
-    borderBottomColor: 'white',
-  },
-  textInput: {
-    backgroundColor: 'white',
-    height: 28,
-    borderRadius: 5,
-    paddingTop: 4.5,
-    paddingBottom: 4.5,
-    paddingLeft: 10,
-    paddingRight: 10,
-    marginTop: 7.5,
-    marginLeft: 8,
-    marginRight: 8,
-    fontSize: 18,
-  },
-  poweredContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.inactive,
-  },
-  powered: {
-    marginTop: 15,
-  },
-  listView: {
-    // flex: 1,
-  },
-  row: {
-    padding: 13,
-    height: 44,
-    flexDirection: 'row',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: 'white',
-  },
-  description: {
-  },
-  loader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    height: 20,
-  },
-  androidLoader: {
-    marginRight: -15,
-  },
-});
 
 export default Register;

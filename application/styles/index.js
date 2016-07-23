@@ -3,6 +3,57 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
+export const autocompleteStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  textInputContainer: {
+    backgroundColor: 'white',
+    height: 44,
+    borderTopColor: 'white',
+    borderBottomColor: 'white',
+  },
+  textInput: {
+    backgroundColor: 'white',
+    height: 28,
+    borderRadius: 5,
+    paddingTop: 4.5,
+    paddingBottom: 4.5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    marginTop: 7.5,
+    marginLeft: 8,
+    marginRight: 8,
+    fontSize: 18,
+  },
+  poweredContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.inactive,
+  },
+  powered: {
+    marginTop: 15,
+  },
+  listView: {
+    flex: 1,
+  },
+  row: {
+    padding: 13,
+    height: 44,
+    flexDirection: 'row',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: 'white',
+  },
+  loader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    height: 20,
+  }
+});
+
 export const landingStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -36,7 +87,7 @@ export const formStyles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 22,
     textAlign: 'center',
-    color: Colors.copyLight,
+    color: Colors.copyMedium,
     paddingVertical: 10,
     paddingHorizontal: 20
   },
@@ -46,6 +97,12 @@ export const formStyles = StyleSheet.create({
     color: Colors.copyDark,
     paddingHorizontal: 20,
     paddingVertical: 5,
+  },
+  h5: {
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    textAlign: 'center',
   },
   errorContainer: {
     paddingHorizontal: 15,
@@ -63,7 +120,7 @@ export const formStyles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    color: Colors.copyLight,
+    color: Colors.copyMedium,
     fontSize: 18,
     fontWeight: '300',
     height: 40,
@@ -140,7 +197,7 @@ export const globals = StyleSheet.create({
   brandPrimary: {
     backgroundColor: Colors.brandPrimary
   },
-  darkText: {
+  primaryText: {
     color: Colors.brandPrimary
   },
   inactive: {
