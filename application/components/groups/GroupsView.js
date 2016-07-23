@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Navigator,
-} from 'react-native';
+import { Navigator } from 'react-native';
+import { find } from 'underscore';
 
 import Conversation from '../messages/Conversation';
 import CreateEvent from './CreateEvent';
@@ -15,7 +11,9 @@ import Event from './Event';
 import Group from './Group';
 import Groups from './Groups';
 import Profile from '../profile/Profile';
+import { globals } from '../../styles';
 import { API, DEV } from '../../config';
+import Headers from '../../fixtures/headers';
 
 class GroupsView extends Component{
   constructor(){
@@ -24,86 +22,97 @@ class GroupsView extends Component{
     this.addUserToGroup = this.addUserToGroup.bind(this);
     this.unsubscribeFromGroup = this.unsubscribeFromGroup.bind(this);
     this.state = {
-      groups: [],
-      suggestedGroups: [],
-      ready: false,
+      groups            : [],
+      ready             : false,
+      suggestedGroups   : [],
     }
+  }
+  componentWillMount(){
+    this._loadGroups(this.props.currentUser);
+  }
+  _loadGroups(currentUser){ /* fetch all groups that the current user belongs to */
+    let query = {
+      members: {
+        $elemMatch: { userId: currentUser.id }
+      },
+      $limit: 10
+    };
+    fetch(`${API}/groups/?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(groups => this._loadSuggestedGroups(groups))
+    .catch(err => this.ready(err))
+    .done();
+  }
+  ready(err){
+    this.setState({ ready: true });
+  }
+  _loadSuggestedGroups(groups){
+    this.setState({ groups, ready: true });
+    let query = { /* query groups that the user does not belong to but are nearby */
+      id: { $nin: groups.map(group => group.id) },
+      'location.city.long_name': currentUser.location.city.long_name,
+      $limit: 4
+    };
+    fetch(`${API}/groups/?${JSON.stringify(query)}`)
+    .then(response => response.json())
+    .then(suggestedGroups => this.setState({ suggestedGroups }))
+    .catch(err => {})
+    .done();
   }
   unsubscribeFromGroup(group, currentUser){
     let { groups, suggestedGroups } = this.state;
     group.members = group.members.filter(member => member.userId !== currentUser.id);
     groups = groups.filter(g => g.id !== group.id);
-    suggestedGroups = suggestedGroups.concat(group);
+    suggestedGroups = [
+      ...suggestedGroups, group
+    ];
     this.setState({ groups, suggestedGroups })
     this.updateGroup(group);
   }
-  componentWillMount(){
-    this.loadGroups(this.props.currentUser);
-  }
   addGroup(group){
-    this.setState({ groups: this.state.groups.concat(group)})
+    this.setState({
+      groups: [
+        ...this.state.groups, group
+      ]
+    })
   }
   updateGroup(group){
     fetch(`${API}/groups/${group.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Headers,
       body: JSON.stringify(group)
     })
     .then(response => response.json())
-    .then(data => { if (DEV) console.log('RES', data) })
-    .catch(err => { if (DEV) console.log('ERROR', err) })
+    .then(data => {})
+    .catch(err => {})
   }
   addUserToGroup(group, currentUser){
     let { groups, suggestedGroups } = this.state;
     let member = {
-      userId: currentUser.id,
-      role: 'member',
-      joinedAt: new Date().valueOf(),
+      userId    : currentUser.id,
+      role      : 'member',
+      joinedAt  : new Date().valueOf(),
       notifications: {
         email: true
       }
     };
-    if (group.members.map(m => m.userId).indexOf(currentUser.id) === -1){
-      group.members = group.members.concat(member);
-      groups = groups.concat(group);
-      suggestedGroups = suggestedGroups.filter(g => g.id !== group.id);
+    if (find(group.members, ({ userId}) => userId === currentUser.id) == 'undefined'){
+      group.members = [
+        ...group.members, member
+      ];
+      groups = [
+        ...groups, group
+      ];
+      suggestedGroups = suggestedGroups.filter(({ id }) => id !== group.id);
       this.setState({ groups, suggestedGroups })
       this.updateGroup(group);
     }
   }
-  loadGroups(currentUser){
-    /* TODO: load user groups and suggested groups */
-    let query = {
-      members: {
-        $elemMatch: {
-          userId: currentUser.id
-        }
-      }
-    };
-    fetch(`${API}/groups/?${JSON.stringify(query)}`)
-    .then(response => response.json())
-    .then(groups => {
-      this.setState({ groups, ready: true });
-      let suggestedGroupsQuery = {
-        id: { $nin: groups.map(group => group.id) },
-        'location.city.long_name': currentUser.location.city.long_name
-      };
-      fetch(`${API}/groups/?${JSON.stringify(suggestedGroupsQuery)}`)
-      .then(response => response.json())
-      .then(suggestedGroups => this.setState({ suggestedGroups }))
-      .catch(err => { if (DEV) console.log('ERR:', err)})
-      .done();
-    })
-    .catch(err => {
-      if (DEV)
-        console.log('ERR:', err);
-      this.setState({ ready: true });
-    });
-  }
+
   render(){
     return (
       <Navigator
-        style={styles.container}
+        style={globals.flex}
         initialRoute={{ name: 'Groups' }}
         renderScene={(route, navigator) => {
           switch(route.name){
@@ -185,14 +194,8 @@ class GroupsView extends Component{
           }
         }}
       />
-    )
+    );
   }
 };
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  }
-});
 
 export default GroupsView;
