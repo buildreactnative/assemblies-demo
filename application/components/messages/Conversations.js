@@ -1,14 +1,12 @@
 import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
-import { Image, ListView, Text, TouchableOpacity, View } from 'react-native';
+import { ListView, View } from 'react-native';
 import { find } from 'underscore';
 
 import Colors from '../../styles/colors';
 import ConversationRow from './ConversationRow';
 import Loading from '../shared/Loading';
-import { globals, messagesStyles } from '../../styles';
-
-const styles = messagesStyles;
+import { globals } from '../../styles';
 
 class Conversations extends Component{
   constructor(){

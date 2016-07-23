@@ -4,7 +4,35 @@ import { Dimensions, StyleSheet } from 'react-native';
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
 export const messagesStyles = {
-
+  h5: {
+    fontSize: 12,
+    fontWeight: '700'
+  },
+  h6: {
+    color: Colors.bodyTextGray,
+    fontSize: 12,
+    fontWeight: '300',
+    fontWeight: '300',
+    marginLeft: 10,
+    marginLeft: 10,
+  },
+  h4: {
+    fontSize: 16,
+    color: '#9B9B9B',
+    fontStyle: 'italic',
+    fontWeight: '300',
+  },
+  arrowContainer: {
+    flex: 0.5,
+    alignItems: 'flex-end',
+    paddingRight: 25,
+  },
+  divider: {
+    borderBottomColor: Colors.inactive,
+    borderBottomWidth: 1,
+    height: 0,
+    width: deviceWidth * 0.95,
+  }
 };
 
 export const calendarStyles = {
@@ -189,7 +217,6 @@ export const landingStyles = StyleSheet.create({
     height: 90,
     width: 90
   },
-
 });
 
 export const formStyles = StyleSheet.create({
@@ -375,4 +402,11 @@ export const globals = StyleSheet.create({
     paddingHorizontal: 10,
     flexDirection: 'row',
   },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginHorizontal: 10,
+    marginVertical: 10,
+  }
 });
