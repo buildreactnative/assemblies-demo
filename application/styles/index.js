@@ -3,7 +3,34 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
-export const messagesStyles = {
+export const groupsStyles = StyleSheet.create({
+  boxContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  groupImage: {
+    height: (deviceWidth / 2) - 25,
+    width: (deviceWidth / 2) - 25,
+    opacity: 0.8,
+    margin: 5,
+  },
+  groupBackground: {
+    opacity: 0.9,
+    flex: 1,
+    padding: 15,
+    height: (deviceWidth / 2) - 25,
+    width: (deviceWidth / 2) - 25,
+  },
+  groupText: {
+    color: 'white',
+    fontSize: 20,
+    position: 'absolute',
+    fontWeight: '500',
+  }
+});
+
+export const messagesStyles = StyleSheet.create({
   h5: {
     fontSize: 12,
     fontWeight: '700'
@@ -105,9 +132,9 @@ export const messagesStyles = {
     justifyContent: 'center',
     marginTop: 8
   }
-};
+});
 
-export const calendarStyles = {
+export const calendarStyles = StyleSheet.create({
   h2: {
     fontSize: 18,
     fontWeight: '300',
@@ -156,9 +183,9 @@ export const calendarStyles = {
     fontSize: 18,
     fontWeight: '300',
   }
-};
+});
 
-export const activityStyles = {
+export const activityStyles = StyleSheet.create({
   h4: {
     color: Colors.bodyText,
     fontSize: 16,
@@ -193,7 +220,7 @@ export const activityStyles = {
     marginHorizontal: 10,
     width: 15,
   }
-};
+});
 
 export const selectStyles = {
   backgroundColor: 'white',
@@ -410,6 +437,9 @@ export const globals = StyleSheet.create({
   },
   ph1: {
     paddingHorizontal: 10
+  },
+  pa1: {
+    padding: 10
   },
   mt1: {
     marginTop: 10

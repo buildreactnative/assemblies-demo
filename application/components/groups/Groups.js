@@ -1,32 +1,27 @@
-import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  Dimensions,
-  StyleSheet,
-} from 'react-native';
-import Colors from '../../styles/colors';
-import NavigationBar from 'react-native-navbar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import NavigationBar from 'react-native-navbar';
+import React, { Component } from 'react';
+import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
+import Colors from '../../styles/colors';
+import Loading from '../shared/Loading';
+import { globals, groupsStyles } from '../../styles';
 
-const Loading = () => (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size='large'/>
-  </View>
-)
-const AddGroupBox = ({ navigator }) => (
+const styles = groupsStyles;
+
+export function formatGroups(groups){
+  if (groups.length % 2 === 1 ){
+    return groups.concat(null);
+  } else {
+    return groups;
+  }
+};
+
+const AddGroupBox = ({ handlePress }) => (
   <TouchableOpacity
-    onPress={()=> {
-      navigator.push({ name: 'CreateGroup' })
-    }}
+    onPress={handlePress}
     style={styles.groupImage}>
-    <View style={[styles.group, {backgroundColor: Colors.inactive,}]} >
+    <View style={[styles.groupBackground, globals.inactive]} >
       <Icon name="add-circle" size={60} color={Colors.brandPrimary} />
     </View>
   </TouchableOpacity>
@@ -35,163 +30,118 @@ const AddGroupBox = ({ navigator }) => (
 const EmptyGroupBox = () => (
   <View style={styles.groupsContainer}>
     <View style={styles.groupImage}>
-      <View style={[styles.group, {backgroundColor: Colors.inactive,}]} />
+      <View style={[styles.groupBackground, globals.inactive]} />
     </View>
   </View>
 );
 
-const EmptyGroupBoxes = ({ navigator }) => (
-  <View style={styles.assemblyBoxContainer}>
+const EmptyGroupBoxes = ({ handlePress }) => (
+  <View style={styles.boxContainer}>
     <View style={styles.groupsContainer}>
-      <AddGroupBox navigator={navigator}/>
+      <AddGroupBox handlePress={handlePress}/>
       <EmptyGroupBox />
     </View>
   </View>
 );
 
 const EmptySuggestedGroupBoxes = () => (
-  <View style={styles.assemblyBoxContainer}>
-    <View style={styles.groupsContainer}>
+  <View style={styles.boxContainer}>
+    <View style={globals.flexRow}>
       <EmptyGroupBox />
       <EmptyGroupBox />
     </View>
   </View>
 )
 
-const GroupBoxes = ({ groups, navigator }) => (
-  <View style={{justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap'}}>
-    {groups.map((group, idx) => {
-      if (!group) { return <EmptyGroupBox key={idx}/>}
-      return (
-        <TouchableOpacity
-          key={idx}
-          style={styles.groupsContainer}
-          onPress={() => navigator.push({
-            name: 'Group',
-            group
-          })}
-        >
-          <Image source={{uri: group.image}} style={styles.groupImage}>
-            <View style={[styles.group, {backgroundColor: group.color,}]} >
-              <Text style={styles.groupText}>{group.name}</Text>
-            </View>
-          </Image>
-        </TouchableOpacity>
-      )
-    })}
-  </View>
-);
+export const GroupBoxes = ({ groups, visitGroup, visitCreateGroup }) => {
+  if (! groups.length ) { return <EmptyGroupBoxes handlePress={visitCreateGroup}/> }
+  return (
+    <View style={styles.boxContainer}>
+      {groups.map((group, idx) => {
+        if (!group) { return <EmptyGroupBox key={idx}/>}
+        return (
+          <TouchableOpacity key={idx} style={globals.flexRow} onPress={() => visitGroup(group)}>
+            <Image source={{uri: group.image}} style={styles.groupImage}>
+              <View style={[styles.groupBackground, {backgroundColor: group.color,}]} >
+                <Text style={styles.groupText}>{group.name}</Text>
+              </View>
+            </Image>
+          </TouchableOpacity>
+        )
+      })}
+    </View>
+  );
+}
 
-const SuggestedGroupBoxes = ({ groups, navigator }) => (
-  <View style={{justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap'}}>
-    {groups.map((group, idx) => {
-      if (!group) { return <EmptyGroupBox key={idx}/>}
-      return (
-        <TouchableOpacity
-          key={idx}
-          style={styles.groupsContainer}
-          onPress={() => navigator.push({ name: 'Group', group})}
-        >
-          <Image source={{uri: group.image}} style={styles.groupImage}>
-            <View style={[styles.group, {backgroundColor: group.color,}]} >
-              <Text style={styles.groupText}>{group.name}</Text>
-            </View>
-          </Image>
-        </TouchableOpacity>
-      );
-    })}
-  </View>
-);
+const SuggestedGroupBoxes = ({ groups, visitGroup }) => {
+  if (! groups.length ) { return <EmptySuggestedGroupBoxes /> }
+  return (
+    <View style={styles.boxContainer}>
+      {groups.map((group, idx) => {
+        if (!group) { return <EmptyGroupBox key={idx}/>}
+        return (
+          <TouchableOpacity key={idx} style={styles.groupsContainer} onPress={() => visitGroup(group)}>
+            <Image source={{uri: group.image}} style={styles.groupImage}>
+              <View style={[styles.group, {backgroundColor: group.color,}]} >
+                <Text style={styles.groupText}>{group.name}</Text>
+              </View>
+            </Image>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+};
+
+const AddButton = ({ handlePress }) => (
+  <TouchableOpacity style={globals.pa1} onPress={handlePress}>
+    <Icon name="add-circle" size={25} color="#ccc" />
+  </TouchableOpacity>
+)
 
 class Groups extends Component{
   constructor(){
     super();
-    this._renderAddButton = this._renderAddButton.bind(this);
+    this.visitCreateGroup = this.visitCreateGroup.bind(this);
+    this.visitGroup = this.visitGroup.bind(this);
   }
-  _renderAddButton(){
-    return (
-      <TouchableOpacity style={styles.navButton} onPress={()=>{
-        this.props.navigator.push({
-          name: 'CreateGroup'
-        })
-      }}>
-        <Icon name="add-circle" size={25} color="#ccc" />
-      </TouchableOpacity>
-    )
+  visitGroup(group){
+    this.props.navigator.push({
+      name: 'Group',
+      group
+    })
+  }
+  visitCreateGroup(){
+    this.props.navigator.push({ name: 'CreateGroup' })
   }
   render(){
     let { groups, suggestedGroups, ready, navigator } = this.props;
     if (! ready ) { return <Loading /> }
-    if (groups.length % 2 === 1){
-      groups = groups.concat(null);
-    }
-    if (suggestedGroups.length % 2 === 1){
-      suggestedGroups = suggestedGroups.concat(null)
-    }
-    let rightButtonConfig = this._renderAddButton()
-    let titleConfig = {title: 'My Groups', tintColor: 'white'}
     return (
-      <View style={styles.container}>
+      <View style={globals.flexContainer}>
         <NavigationBar
-          statusBar={{style: 'light-content', hidden: false}}
-          title={titleConfig}
+          title={{title: 'My Groups', tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          rightButton={rightButtonConfig}
+          rightButton={<AddButton handlePress={this.visitCreateGroup}/>}
         />
-        <ScrollView style={styles.assembliesContainer}>
-          <Text style={styles.h2}>Your Assemblies</Text>
-          {groups.length ? <GroupBoxes groups={groups} navigator={navigator}/> : <EmptyGroupBoxes navigator={navigator}/>}
-          <Text style={styles.h2}>You Might Like</Text>
-          {suggestedGroups.length ? <SuggestedGroupBoxes groups={suggestedGroups} navigator={navigator}/> : <EmptySuggestedGroupBoxes />}
+        <ScrollView style={[globals.flex, globals.pa1]}>
+          <Text style={globals.h4}>Your Assemblies</Text>
+          <GroupBoxes
+            groups={formatGroups(groups)}
+            navigator={navigator}
+            visitGroup={this.visitGroup}
+            visitCreateGroup={this.visitCreateGroup}
+          />
+          <Text style={globals.h4}>You Might Like</Text>
+          <SuggestedGroupBoxes
+            groups={formatGroups(suggestedGroups)}
+            navigator={navigator}
+            visitGroup={this.visitGroup}
+          />
         </ScrollView>
       </View>
     )
   }
 };
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  h2: {
-    fontSize: 20,
-    fontWeight: '400',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    color: Colors.bodyText,
-  },
-  group: {
-    opacity: 0.9,
-    flex: 1,
-    padding: 15,
-    height: (deviceWidth / 2) - 25,
-    width: (deviceWidth / 2) - 25,
-  },
-  groupsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-  },
-  groupImage: {
-    height: (deviceWidth / 2) - 25,
-    width: (deviceWidth / 2) - 25,
-    opacity: 0.8,
-    margin: 5,
-  },
-  navButton: {
-    padding: 10,
-  },
-  groupText: {
-    color: 'white',
-    fontSize: 20,
-    position: 'absolute',
-    fontWeight: '500',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});
 
 export default Groups;
