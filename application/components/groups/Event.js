@@ -18,7 +18,10 @@ import {
 import Colors from '../../styles/colors';
 import Globals from '../../styles/globals';
 import LeftNavButton from '../shared/LeftNavButton';
+import { globals, groupsStyles } from '../../styles';
 import { API, DEV } from '../../config';
+
+const styles = groupsStyles;
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
@@ -86,23 +89,26 @@ const JoinControls = ({ hasJoined, joinEvent }) => (
 class Event extends Component{
   constructor(){
     super();
+    this.goBack = this.goBack.bind(this);
     this.joinEvent = this.joinEvent.bind(this);
     this.state = {
       ready         : false,
       eventMembers  : []
     }
   }
-  componentDidMount(){
-    let { event } = this.props;
-    InteractionManager.runAfterInteractions(() => {
-      this.setState({ ready: true })
-    });
-    let query = { id: { $in: event.going }}
+  _loadUsers(){
+    let query = { id: { $in: this.props.event.going } };
     fetch(`${API}/users?${JSON.stringify(query)}`)
     .then(response => response.json())
     .then(eventMembers => this.setState({ eventMembers }))
-    .catch(err => console.log('FETCH USERS ERROR: ', err))
+    .catch(err => {})
     .done();
+  }
+  componentDidMount(){
+    this._loadUsers();
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({ ready: true })
+    });
   }
   joinEvent(){
     let { eventMembers } = this.state;
@@ -120,6 +126,9 @@ class Event extends Component{
     .catch(err => console.log('UPDATE EVENT ERROR: ', err))
     .done();
   }
+  goBack(){
+    this.props.navigator.pop();
+  }
   render(){
     let { ready, eventMembers } = this.state;
     let { event, group, currentUser, navigator } = this.props;
@@ -131,7 +140,7 @@ class Event extends Component{
         <NavigationBar
           title={{title: event.name, tintColor: 'white'}}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={this.goBack}/>}
         />
         <ScrollView style={styles.scrollView}>
           <EventMap location={event.location} going={event.going} ready={ready}/>
@@ -176,211 +185,210 @@ class Event extends Component{
   }
 }
 
-let styles = StyleSheet.create({
-  backButton: {
-    paddingLeft: 20,
-    paddingBottom: 10,
-    backgroundColor: 'transparent',
-  },
-  infoContainer: {
-    marginHorizontal: 10,
-    paddingVertical: 5,
-  },
-  submitButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '300'
-  },
-  addButton: {
-    backgroundColor: 'transparent',
-    paddingRight: 20,
-    paddingBottom: 10,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  inputBox: {
-    height: 60,
-    backgroundColor: '#f2f2f2',
-    flexDirection: 'row',
-  },
-  input: {
-    height: 40,
-    padding: 8,
-    flex: 1,
-    fontSize: 16,
-    margin: 10,
-    marginRight: 5,
-    borderColor: '#b4b4b4',
-    borderRadius: 8,
-    color: Colors.bodyText,
-    backgroundColor: 'white',
-  },
-  buttonActive: {
-    flex: 0.4,
-    backgroundColor: Colors.brandPrimary,
-    borderRadius: 6,
-    justifyContent: 'center',
-    margin: 10,
-  },
-  buttonInactive: {
-    flex: 0.4,
-    backgroundColor: "#eeeeee",
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    borderRadius: 6,
-    justifyContent: 'center',
-    margin: 10,
-  },
-  buttonText: {
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 16,
-  },
-  centering: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: deviceHeight,
-  },
-  sentText:{
-    fontSize: 14,
-    padding: 10,
-    marginRight: 15,
-    fontWeight: '300',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  commentTitleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingRight: 20,
-  },
-  topImage: {
-    width: deviceWidth,
-    height: 200,
-    flexDirection: 'column',
-  },
-  overlayBlur: {
-    backgroundColor: '#333',
-    opacity: 0.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  h1: {
-    fontSize: 22,
-    color: 'white',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  bottomPanel: {
-    flex: 0.3,
-    backgroundColor: Colors.inactive,
-    opacity: 0.5,
-    height: 50,
-    justifyContent: 'center',
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  memberText: {
-    textAlign: 'center',
-    color: Colors.bodyText,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  h4: {
-    fontSize: 18,
-    fontWeight: '300',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  h3: {
-    fontSize: 18,
-    color: Colors.brandPrimary,
-    paddingHorizontal: 18,
-    paddingVertical: 5,
-    fontWeight: '500',
-  },
-  break: {
-    height: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginVertical: 5,
-  },
-  h2: {
-    fontSize: 20,
-    fontWeight: '400',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  eventContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  joinContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-  },
-  joinButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    backgroundColor: Colors.brandPrimary,
-  },
-  joinText: {
-    fontSize: 22,
-    color: 'white',
-    fontWeight: 'bold',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    textAlign: 'center',
-  },
-  joinIcon: {
-    paddingVertical: 10,
-  },
-  eventInfo: {
-    flex: 1,
-  },
-  h5: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  goingContainer: {
-    backgroundColor: 'white',
-    marginHorizontal: 10,
-    overflow: 'hidden',
-    marginBottom: 50,
-    paddingHorizontal: 10,
-  },
-  goingText: {
-    fontSize: 17,
-    color: Colors.brandPrimary
-  },
-  memberContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  avatar: {
-    height: 70,
-    width: 70,
-    borderRadius: 35,
-  },
-  memberInfo: {
-    paddingLeft: 30,
-  },
-});
-
-
 export default Event;
+//
+// let styles = StyleSheet.create({
+//   backButton: {
+//     paddingLeft: 20,
+//     paddingBottom: 10,
+//     backgroundColor: 'transparent',
+//   },
+//   infoContainer: {
+//     marginHorizontal: 10,
+//     paddingVertical: 5,
+//   },
+//   submitButtonText: {
+//     color: 'white',
+//     textAlign: 'center',
+//     fontSize: 16,
+//     fontWeight: '300'
+//   },
+//   addButton: {
+//     backgroundColor: 'transparent',
+//     paddingRight: 20,
+//     paddingBottom: 10,
+//   },
+//   container: {
+//     flex: 1,
+//     backgroundColor: 'white',
+//   },
+//   inputBox: {
+//     height: 60,
+//     backgroundColor: '#f2f2f2',
+//     flexDirection: 'row',
+//   },
+//   input: {
+//     height: 40,
+//     padding: 8,
+//     flex: 1,
+//     fontSize: 16,
+//     margin: 10,
+//     marginRight: 5,
+//     borderColor: '#b4b4b4',
+//     borderRadius: 8,
+//     color: Colors.bodyText,
+//     backgroundColor: 'white',
+//   },
+//   buttonActive: {
+//     flex: 0.4,
+//     backgroundColor: Colors.brandPrimary,
+//     borderRadius: 6,
+//     justifyContent: 'center',
+//     margin: 10,
+//   },
+//   buttonInactive: {
+//     flex: 0.4,
+//     backgroundColor: "#eeeeee",
+//     borderWidth: 1,
+//     borderColor: '#ffffff',
+//     borderRadius: 6,
+//     justifyContent: 'center',
+//     margin: 10,
+//   },
+//   buttonText: {
+//     textAlign: 'center',
+//     color: 'white',
+//     fontSize: 16,
+//   },
+//   centering: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     height: deviceHeight,
+//   },
+//   sentText:{
+//     fontSize: 14,
+//     padding: 10,
+//     marginRight: 15,
+//     fontWeight: '300',
+//   },
+//   scrollView: {
+//     flex: 1,
+//   },
+//   commentTitleContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingRight: 20,
+//   },
+//   topImage: {
+//     width: deviceWidth,
+//     height: 200,
+//     flexDirection: 'column',
+//   },
+//   overlayBlur: {
+//     backgroundColor: '#333',
+//     opacity: 0.5,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     flex: 1,
+//   },
+//   h1: {
+//     fontSize: 22,
+//     color: 'white',
+//     fontWeight: '500',
+//     textAlign: 'center',
+//   },
+//   bottomPanel: {
+//     flex: 0.3,
+//     backgroundColor: Colors.inactive,
+//     opacity: 0.5,
+//     height: 50,
+//     justifyContent: 'center',
+//     paddingVertical: 12,
+//     alignItems: 'center',
+//   },
+//   memberText: {
+//     textAlign: 'center',
+//     color: Colors.bodyText,
+//     fontSize: 18,
+//     fontWeight: '400',
+//   },
+//   h4: {
+//     fontSize: 18,
+//     fontWeight: '300',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//   },
+//   h3: {
+//     fontSize: 18,
+//     color: Colors.brandPrimary,
+//     paddingHorizontal: 18,
+//     paddingVertical: 5,
+//     fontWeight: '500',
+//   },
+//   break: {
+//     height: 1,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//     marginVertical: 5,
+//   },
+//   h2: {
+//     fontSize: 20,
+//     fontWeight: '400',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//   },
+//   eventContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingVertical: 10,
+//   },
+//   joinContainer: {
+//     flex: 1,
+//     paddingHorizontal: 20,
+//     marginVertical: 10,
+//   },
+//   joinButton: {
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     borderRadius: 4,
+//     backgroundColor: Colors.brandPrimary,
+//   },
+//   joinText: {
+//     fontSize: 22,
+//     color: 'white',
+//     fontWeight: 'bold',
+//     paddingHorizontal: 10,
+//     paddingVertical: 10,
+//     textAlign: 'center',
+//   },
+//   joinIcon: {
+//     paddingVertical: 10,
+//   },
+//   eventInfo: {
+//     flex: 1,
+//   },
+//   h5: {
+//     fontSize: 18,
+//     fontWeight: '500',
+//   },
+//   goingContainer: {
+//     backgroundColor: 'white',
+//     marginHorizontal: 10,
+//     overflow: 'hidden',
+//     marginBottom: 50,
+//     paddingHorizontal: 10,
+//   },
+//   goingText: {
+//     fontSize: 17,
+//     color: Colors.brandPrimary
+//   },
+//   memberContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'flex-start',
+//     paddingHorizontal: 20,
+//     paddingVertical: 10,
+//     alignItems: 'center',
+//   },
+//   avatar: {
+//     height: 70,
+//     width: 70,
+//     borderRadius: 35,
+//   },
+//   memberInfo: {
+//     paddingLeft: 30,
+//   },
+// });
