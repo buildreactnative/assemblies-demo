@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
+import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
 import {
   ScrollView,
@@ -13,9 +14,8 @@ import {
 } from 'react-native';
 
 import Colors from '../../styles/colors';
-import NavigationBar from 'react-native-navbar';
-import {API, DEV} from '../../config';
 import LeftNavButton from '../shared/LeftNavButton';
+import {API, DEV} from '../../config';
 
 let { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
