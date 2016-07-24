@@ -89,6 +89,10 @@ export const groupsStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     textAlign: 'center',
+  },
+  infoContainer: {
+    marginHorizontal: 10,
+    paddingVertical: 5,
   }
 });
 

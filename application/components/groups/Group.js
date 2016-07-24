@@ -34,9 +34,7 @@ const Join = () => (
 )
 
 const Joined = () => (
-  <View style={styles.joinedContainer}>
-    <Icon name="ios-checkmark" size={30} color='white' style={styles.joinIcon}/>
-  </View>
+  <Icon name="ios-checkmark" size={30} color='white' style={styles.joinIcon}/>
 );
 
 class EventList extends Component{
@@ -115,7 +113,7 @@ class JoinButton extends Component{
   }
 }
 
-const GroupMembers = ({ users, members, handlePress }) => {
+export const GroupMembers = ({ users, members, handlePress }) => {
   return (
     <View style={globals.flex}>
       {members.map((member, idx) => {
@@ -145,6 +143,7 @@ class Group extends Component{
     this.visitProfile = this.visitProfile.bind(this);
     this.visitEvent = this.visitEvent.bind(this);
     this.visitCreateEvent = this.visitCreateEvent.bind(this);
+    this.updateEvents = this.updateEvents.bind(this);
     this.state = {
       events    : [],
       ready     : false,
@@ -212,6 +211,16 @@ class Group extends Component{
     .done();
   }
 
+  updateEvents(event){
+    let idx = findIndex(this.state.events, ({ id }) => isEqual(id, event.id));
+    let events = [
+      ...this.state.events.slice(0, idx),
+      event,
+      ...this.state.events.slice(idx + 1)
+    ];
+    this.setState({ events })
+  }
+
   joinEvent(event, currentUser){
     let { events } = this.state;
     let updatedEvent = {
@@ -265,6 +274,7 @@ class Group extends Component{
     this.props.navigator.push({
       name: 'Event',
       group: this.props.group,
+      updateEvents: this.updateEvents,
       event,
     })
   }
