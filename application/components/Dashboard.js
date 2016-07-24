@@ -23,7 +23,7 @@ class Dashboard extends Component{
   logout(){ /* end the current session and redirect to the Landing page */
     fetch(`${API}/users/logout`, { method: 'POST', headers: Headers })
     .then(response => response.json())
-    .then(data => this.props.navigator.popToTop())
+    .then(data => this.props.logout())
     .catch(err => {})
     .done();
   }

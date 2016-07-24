@@ -25,6 +25,7 @@ import Headers from './application/fixtures/headers';
 class assemblies extends Component {
   constructor(){
     super();
+    this.logout = this.logout.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.state = {
       user          : null,
@@ -62,6 +63,10 @@ class assemblies extends Component {
     this.setState({ user });
     if (!user) this.nav.push({ name: 'Landing' })
   }
+  logout(){
+    console.log('LOGOUT')
+    this.nav.push({ name: 'Landing' })
+  }
   render() {
     if (! this.state.ready ) { return <Loading /> }
     return (
@@ -80,6 +85,7 @@ class assemblies extends Component {
                 navigator={navigator}
                 currentUser={this.state.user}
                 updateUser={this.updateUser}
+                logout={this.logout}
               />
             );
           case 'Register':
