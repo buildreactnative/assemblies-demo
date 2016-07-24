@@ -1,75 +1,95 @@
-import _ from 'underscore';
-import Config from 'react-native-config';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
-import {
-  Text,
-  View,
-  ScrollView,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions
-} from 'react-native';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { autocompleteStyles } from '../accounts/Register';
+import { find } from 'underscore';
 
 import Colors from '../../styles/colors';
-import Globals from '../../styles/globals';
+import Headers from '../../fixtures/headers';
 import LeftNavButton from '../shared/LeftNavButton';
-import {DEV, API} from '../../config';
+import { GooglePlacesCityConfig } from '../../config';
+import { DEV, API } from '../../config';
+import { globals, formStyles, autocompleteStyles } from '../../styles';
 
-const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
+const styles = formStyles;
 
+function setErrorMsg({ location, firstName, lastName, email }){
+  if (typeof location !== 'object' || ! location.city ) {
+    return 'Must provide valid location.';
+  } else if (firstName === ''){
+    return 'Must provide a valid first name.';
+  } else if (lastName === '') {
+    return 'Must provide a valid last name.';
+  } else if (email === ''){
+    return 'Must provide a valid email address.';
+  } else {
+    return '';
+  }
+}
 class UserSettings extends Component{
   constructor(props){
     super(props);
+    this.goBack = this.goBack.bind(this);
     this.saveSettings = this.saveSettings.bind(this);
+    this.selectLocation = this.selectLocation.bind(this);
     this.state = {
-      location: props.currentUser.location,
-      firstName: props.currentUser.firstName,
-      lastName: props.currentUser.lastName,
-      email: props.currentUser.username,
-      errorMsg: '',
+      email     : props.currentUser.username,
+      errorMsg  : '',
+      firstName : props.currentUser.firstName,
+      lastName  : props.currentUser.lastName,
+      location  : props.currentUser.location,
     }
   }
   saveSettings(){
-    let { location, firstName, lastName, email } = this.state;
-    if (typeof location !== 'object' || ! location.city ) {
-      this.setState({ errorMsg: 'Must provide valid location.'}); return;
-    } else if (firstName === ''){
-      this.setState({ errorMsg: 'Must provide a valid first name.'}); return;
-    } else if (lastName === '') {
-      this.setState({ errorMsg: 'Must provide a valid last name.'}); return;
-    } else if (email === ''){
-      this.setState({ errorMsg: 'Must provide a valid email address.'}); return;
+    let errorMsg = setErrorMsg(this.state);
+    if (errorMsg !== '') {
+      this.setState({ errorMsg }); return;
     }
+    let user = {
+      location: this.state.location,
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email
+    };
     fetch(`${API}/users/${this.props.currentUser.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ location, firstName, lastName, email })
+      headers: Headers,
+      body: JSON.stringify(user)
     })
     .then(response => response.json())
-    .then(data => {
-      this.props.updateUser(data);
-      this.props.navigator.pop();
-    })
+    .then(user => this.updateUser(user))
     .catch(err => console.log('ERR:', err))
     .done();
   }
+  updateUser(user){
+    this.props.updateUser(user);
+    this.goBack();
+  }
+  selectLocation(data, details){
+    if ( ! details ) { return; }
+    let location = {
+      ...details.geometry.location,
+      city: find(details.address_components, (c) => c.types[0] === 'locality'),
+      state: find(details.address_components, (c) => c.types[0] === 'administrative_area_level_1'),
+      county: find(details.address_components, (c) => c.types[0] === 'administrative_area_level_2'),
+      formattedAddress: details.formatted_address
+    };
+    this.setState({ location });
+  }
+  goBack(){
+    this.props.navigator.pop();
+  }
   render(){
-    let { navigator } = this.props;
-    let titleConfig = { title: 'User Settings', tintColor: 'white' };
     return (
-      <View style={styles.container}>
+      <View style={[globals.flexContainer, globals.inactive]}>
         <NavigationBar
-          title={titleConfig}
+          title={{ title: 'User Settings', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={this.goBack}/>}
         />
-        <KeyboardAwareScrollView style={styles.formContainer}>
+        <KeyboardAwareScrollView style={[styles.formContainer, globals.mt1]}>
           <Text style={styles.h4}>{"* Where are you looking for assemblies?"}</Text>
           <View ref="location" style={{flex: 1,}}>
             <GooglePlacesAutocomplete
@@ -78,41 +98,24 @@ class UserSettings extends Component{
               minLength={2}
               autoFocus={false}
               fetchDetails={true}
-              onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                if (DEV) {console.log(data);}
-                if (DEV) {console.log(details);}
-                this.setState({
-                  location: _.extend({}, details.geometry.location, {
-                    city: _.find(details.address_components, (c) => c.types[0] == 'locality'),
-                    state: _.find(details.address_components, (c) => c.types[0] == 'administrative_area_level_1'),
-                    county: _.find(details.address_components, (c) => c.types[0] == 'administrative_area_level_2'),
-                    formattedAddress: details.formatted_address,
-                  })
-                });
-              }}
+              onPress={this.selectLocation}
               getDefaultValue={() => {return this.state.location.city.long_name;}}
-              query={{
-                key       :  Config.GOOGLE_PLACES_API_KEY,
-                language  : 'en', // language of the results
-                types     : '(cities)', // default: 'geocode'
-              }}
+              query={GooglePlacesCityConfig}
               currentLocation={false}
               currentLocationLabel="Current location"
               nearbyPlacesAPI='GooglePlacesSearch'
               GoogleReverseGeocodingQuery={{}}
               GooglePlacesSearchQuery={{rankby: 'distance',}}
-              filterReverseGeocodingByTypes={['street_address']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+              filterReverseGeocodingByTypes={['street_address']}
               predefinedPlaces={[]}>
             </GooglePlacesAutocomplete>
           </View>
-
           <Text style={styles.h4}>* Email</Text>
-
-          <View ref="email" style={styles.formField}>
+          <View style={styles.formField}>
             <TextInput
-              ref="emailField"
+              ref={(el) => this.email = el }
               returnKeyType="next"
-              onChangeText={(text) => this.setState({email: text})}
+              onChangeText={(email) => this.setState({ email })}
               keyboardType="email-address"
               autoCapitalize="none"
               maxLength={144}
@@ -123,13 +126,13 @@ class UserSettings extends Component{
             />
           </View>
           <Text style={styles.h4}>* First Name</Text>
-          <View style={styles.formField} ref="firstName">
+          <View style={styles.formField}>
             <TextInput
-              ref="firstNameField"
+              ref={(el) => this.firstName = el }
               returnKeyType="next"
               maxLength={20}
               value={this.state.firstName}
-              onChangeText={(text) => this.setState({ firstName: text})}
+              onChangeText={(firstName) => this.setState({ firstName })}
               placeholderTextColor='#bbb'
               style={styles.input}
               placeholder="Your first name"
@@ -140,8 +143,8 @@ class UserSettings extends Component{
             <TextInput
               returnKeyType="next"
               maxLength={20}
-              ref="lastNameField"
-              onChangeText={(text) => this.setState({lastName: text})}
+              ref={(el) => this.lastName = el }
+              onChangeText={(lastName) => this.setState({ lastName })}
               placeholderTextColor='#bbb'
               value={this.state.lastName}
               style={styles.input}
@@ -149,101 +152,12 @@ class UserSettings extends Component{
             />
          </View>
         </KeyboardAwareScrollView>
-        <TouchableOpacity style={[Globals.submitButton, {marginBottom: 50}]} onPress={this.saveSettings}>
-          <Text style={Globals.submitButtonText}>SAVE</Text>
+        <TouchableOpacity style={[styles.submitButton, styles.buttonMargin]} onPress={this.saveSettings}>
+          <Text style={globals.largeButtonText}>SAVE</Text>
         </TouchableOpacity>
       </View>
     )
   }
 }
-
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backButton: {
-    paddingLeft: 20,
-    backgroundColor: 'transparent',
-    paddingBottom: 10,
-  },
-  technologyList:{
-    textAlign: 'left',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.brandPrimary,
-    paddingHorizontal: 20,
-    marginLeft: 8,
-    paddingVertical: 4,
-  },
-  formContainer: {
-    backgroundColor: Colors.inactive,
-    flex: 1,
-    paddingTop: 15,
-  },
-  contentContainerStyle: {
-    flex: 1,
-  },
-  h4: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'black',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  h5: {
-    fontSize: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    textAlign: 'center',
-  },
-  formField: {
-    backgroundColor: 'white',
-    height: 50,
-    paddingTop: 5,
-    marginBottom: 10,
-  },
-  largeFormField: {
-    backgroundColor: 'white',
-    height: 100,
-  },
-  addPhotoContainer: {
-    backgroundColor: 'white',
-    marginVertical: 15,
-      marginHorizontal: (deviceWidth - 200) / 2,
-    width: 200,
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoText: {
-    fontSize: 18,
-    paddingHorizontal: 10,
-    color: Colors.brandPrimary
-  },
-  input: {
-    color: '#777',
-    fontSize: 18,
-    fontWeight: '300',
-    height: 40,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  pb: {
-    paddingBottom: 10,
-  },
-  largeInput: {
-    color: '#ccc',
-    fontSize: 18,
-    backgroundColor: 'white',
-    fontWeight: '300',
-    height: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-});
 
 export default UserSettings;
