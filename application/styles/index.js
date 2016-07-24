@@ -390,6 +390,11 @@ export const formStyles = StyleSheet.create({
     flex: 1,
     paddingVertical: 15
   },
+  flexRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
   h3: {
     color: Colors.copyMedium,
     fontSize: 22,
@@ -422,6 +427,11 @@ export const formStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '300',
     color: Colors.red
+  },
+  btnGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   avatarContainer: {
     backgroundColor: 'white',
@@ -513,6 +523,23 @@ export const formStyles = StyleSheet.create({
   slider: {
     marginHorizontal: 20,
     marginVertical: 5,
+  },
+  modal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20
+  },
+  datepicker: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 3,
+  },
+  pickerButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    marginHorizontal: 5
   }
 })
 
@@ -565,6 +592,9 @@ export const globals = StyleSheet.create({
   },
   mb1: {
     marginBottom: 10
+  },
+  mr1: {
+    marginRight: 10
   },
   mh1: {
     marginHorizontal: 10

@@ -115,7 +115,7 @@ class JoinButton extends Component{
 
 export const GroupMembers = ({ users, members, handlePress }) => {
   return (
-    <View style={globals.flex}>
+    <View>
       {members.map((member, idx) => {
         let user = find(users, ({ id }) => isEqual(id, member.userId));
         if ( ! user ) { return; }

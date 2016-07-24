@@ -8,6 +8,7 @@ import { find } from 'underscore';
 
 import Colors from '../../styles/colors';
 import LeftNavButton from '../shared/LeftNavButton';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { GooglePlacesStreetConfig } from '../../config';
 import { globals, formStyles, autocompleteStyles } from '../../styles';
 
@@ -59,25 +60,27 @@ class CreateEvent extends Component{
           tintColor={Colors.brandPrimary}
           leftButton={<LeftNavButton handlePress={this.goBack}/>}
         />
-        <ScrollView style={[styles.formContainer, globals.pv1]} contentInset={{ bottom: 49 }}>
+        <KeyboardAwareScrollView style={[styles.formContainer, globals.mt1]} contentInset={{bottom: 49}}>
           <Text style={styles.h4}>* Where is the event?</Text>
-          <GooglePlacesAutocomplete
-            styles={autocompleteStyles}
-            placeholder='Type a place or street address'
-            minLength={2}
-            autoFocus={true}
-            fetchDetails={true}
-            onPress={this.saveLocation}
-            getDefaultValue={() => ''}
-            query={GooglePlacesStreetConfig}
-            currentLocation={false}
-            currentLocationLabel='Current Location'
-            nearbyPlacesAPI='GooglePlacesSearch'
-            GoogleReverseGeocodingQuery={{}}
-            GooglePlacesSearchQuery={{ rankby: 'distance' }}
-            filterReverseGeocodingByTypes={['locality', 'adminstrative_area_level_3']}
-            predefinedPlaces={[]}
-          />
+          <View style={globals.flex}>
+            <GooglePlacesAutocomplete
+              styles={autocompleteStyles}
+              placeholder='Type a place or street address'
+              minLength={2}
+              autoFocus={true}
+              fetchDetails={true}
+              onPress={this.saveLocation}
+              getDefaultValue={() => ''}
+              query={GooglePlacesStreetConfig}
+              currentLocation={false}
+              currentLocationLabel='Current Location'
+              nearbyPlacesAPI='GooglePlacesSearch'
+              GoogleReverseGeocodingQuery={{}}
+              GooglePlacesSearchQuery={{ rankby: 'distance' }}
+              filterReverseGeocodingByTypes={['locality', 'adminstrative_area_level_3']}
+              predefinedPlaces={[]}
+            />
+          </View>
           <Text style={styles.h4}>{"* What's the event name?"}</Text>
           <View style={styles.formField}>
             <TextInput
@@ -95,7 +98,7 @@ class CreateEvent extends Component{
               <Text style={styles.input}>{capacity ? capacity : 'Choose a duration'}</Text>
             </View>
           </View>
-          <View style={[globals.flex, globals.mv1]}>
+          <View style={globals.mv1}>
             <Slider
               style={styles.slider}
               defaultValue={capacity}
@@ -106,7 +109,7 @@ class CreateEvent extends Component{
               onValueChange={(val) => this.setState({capacity: val})}
             />
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <TouchableOpacity
           onPress={this.submitForm}
           style={[styles.submitButton, styles.buttonMargin]}>
