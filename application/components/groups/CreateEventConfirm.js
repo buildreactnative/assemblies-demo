@@ -51,7 +51,7 @@ class CreateEventConfirm extends Component{
       this.setState({ errorMsg }); return;
     }
     let event = {
-      capacity    : this.state.capacity,
+      capacity    : this.props.capacity,
       description : this.state.description,
       createdAt   : new Date().valueOf(),
       end         : this.state.finalEnd.valueOf(),
@@ -61,6 +61,7 @@ class CreateEventConfirm extends Component{
       name        : this.props.eventName,
       start       : this.state.finalStart.valueOf(),
     };
+    console.log('EVENT', event);
     fetch(`${API}/events`, {
       method: 'POST',
       headers: Headers,
@@ -68,7 +69,10 @@ class CreateEventConfirm extends Component{
     })
     .then(response => response.json())
     .then(data => this.props.navigator.push({ name: 'Group', group: this.props.group }))
-    .catch(err => this.setState({ errorMsg: err.reason }))
+    .catch(err => {
+      console.log('ERR', err);
+      this.setState({ errorMsg: err.reason })
+    })
     .done();
   }
   goBack(){
