@@ -459,11 +459,23 @@ export const formStyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 5,
   },
+  largeInput: {
+    color: '#777',
+    fontSize: 18,
+    backgroundColor: 'white',
+    fontWeight: '300',
+    height: 120,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
   submitButton: {
     alignItems: 'center',
     backgroundColor: Colors.brandPrimary,
     height: 70,
     justifyContent: 'center',
+  },
+  buttonMargin: {
+    marginBottom: 50
   },
   textContainer: {
     paddingHorizontal: 10,
