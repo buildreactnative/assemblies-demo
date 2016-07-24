@@ -509,6 +509,10 @@ export const formStyles = StyleSheet.create({
     width: (deviceWidth / 4) - 20,
     margin: 10,
     borderWidth: 4,
+  },
+  slider: {
+    marginHorizontal: 20,
+    marginVertical: 5,
   }
 })
 

@@ -9,3 +9,8 @@ export const GooglePlacesCityConfig = {
   language: 'en',
   types: '(cities)',
 };
+
+export const GooglePlacesStreetConfig = {
+  key:  Config.GOOGLE_PLACES_API_KEY,
+  language: 'en'
+}
