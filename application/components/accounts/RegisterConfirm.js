@@ -33,14 +33,10 @@ function setErrorMsg({ email, password, location, firstName, lastName}){
 }
 
 /* selected technologies by user */
-const TechnologyList = ({ technologies, handlePress }) => (
+export const TechnologyList = ({ technologies, handlePress }) => (
   <View style={styles.textContainer}>
     {technologies.map((technology, idx) => (
-      <TouchableOpacity
-        key={idx}
-        onPress={() => handlePress(idx)}
-        style={styles.technology}
-      >
+      <TouchableOpacity key={idx} onPress={() => handlePress(idx)} style={styles.technology}>
         <Text style={[styles.h6, globals.primaryText]}>{technology}</Text>
       </TouchableOpacity>
     ))}

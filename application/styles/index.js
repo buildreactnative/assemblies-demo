@@ -533,6 +533,8 @@ export const formStyles = StyleSheet.create({
   textContainer: {
     paddingHorizontal: 10,
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: deviceWidth
   },
   technology: {
     marginHorizontal: 4,
