@@ -4,7 +4,7 @@ import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
 import { View, Text, ListView, TouchableOpacity } from 'react-native';
 import { uniq, flatten, find } from 'underscore';
-
+import { getSectionData, getRowData, sectionHeaderHasChanged, rowHasChanged } from '../../utilities';
 import Loading from '../shared/Loading';
 import { globals, calendarStyles } from '../../styles';
 
@@ -50,10 +50,10 @@ class EventList extends Component{
     });
 
     return new ListView.DataSource({
-      getSectionData: (dataBlob, sectionID) => dataBlob[sectionID],
-      getRowData: (dataBlob, sectionID, rowID) => dataBlob[`${sectionID}:${rowID}`],
-      rowHasChanged: (r1, r2) => r1 != r2,
-      sectionHeaderHasChanged: (s1, s2) => s1 != s2
+      getSectionData: getSectionData,
+      getRowData: getRowData,
+      rowHasChanged: rowHasChanged,
+      sectionHeaderHasChanged: sectionHeaderHasChanged
     })
     .cloneWithRowsAndSections(dataBlob, sectionIDs, rowIDs);
   }
