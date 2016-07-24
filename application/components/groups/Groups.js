@@ -27,7 +27,7 @@ const AddGroupBox = ({ handlePress }) => (
   </TouchableOpacity>
 );
 
-const EmptyGroupBox = () => (
+export const EmptyGroupBox = () => (
   <View style={styles.groupsContainer}>
     <View style={styles.groupImage}>
       <View style={[styles.groupBackground, globals.inactive]} />

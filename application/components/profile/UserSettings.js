@@ -1,7 +1,7 @@
 import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { find } from 'underscore';
@@ -14,6 +14,7 @@ import { DEV, API } from '../../config';
 import { globals, formStyles, autocompleteStyles } from '../../styles';
 
 const styles = formStyles;
+const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
 function setErrorMsg({ location, firstName, lastName, email }){
   if (typeof location !== 'object' || ! location.city ) {

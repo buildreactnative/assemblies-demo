@@ -19,6 +19,10 @@ export const profileStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#777',
   },
+  avatarContainer: {
+    height: 120,
+    alignItems: 'center'
+  },
   infoContainer: {
     flex: 1.2,
     justifyContent: 'center',
@@ -601,6 +605,11 @@ export const globals = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white'
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   lightText: {
     color: 'white'
   },
@@ -634,6 +643,9 @@ export const globals = StyleSheet.create({
   },
   mt1: {
     marginTop: 10
+  },
+  mv2: {
+    marginVertical: 20
   },
   mb1: {
     marginBottom: 10
@@ -707,6 +719,9 @@ export const globals = StyleSheet.create({
   textContainer: {
     paddingHorizontal: 10,
     flexDirection: 'row',
+  },
+  centerText: {
+    textAlign: 'center'
   },
   avatar: {
     width: 50,

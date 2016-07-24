@@ -2,7 +2,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import NavigationBar from 'react-native-navbar';
 import Dropdown, { Select, Option, OptionList } from 'react-native-selectme';
 import React, { Component } from 'react';
-import { Text, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, ScrollView, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uniq } from 'underscore';
 
@@ -16,6 +16,7 @@ import { globals, formStyles, selectStyles, optionTextStyles, overlayStyles } fr
 import { TechnologyList } from '../accounts/RegisterConfirm';
 
 const styles = formStyles;
+const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
 
 class UserTechnologies extends Component{
   constructor(props){
