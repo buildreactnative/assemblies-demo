@@ -1,5 +1,5 @@
-import _ from 'underscore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ImagePicker from 'react-native-image-picker';
 import NavigationBar from 'react-native-navbar';
 import Dropdown, {
   Select,
@@ -7,142 +7,126 @@ import Dropdown, {
   OptionList
 } from 'react-native-selectme';
 import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  Dimensions,
-  StyleSheet,
-  ActivityIndicator
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { uniq } from 'underscore';
 
 import Colors from '../../styles/colors';
-import Globals from '../../styles/globals';
+import Headers from '../../fixtures/headers';
 import LeftNavButton from '../shared/LeftNavButton';
 import { API, DEV } from '../../config';
 import { Technologies, ImageOptions, DefaultAvatar } from '../../fixtures';
-
+import { SolidColors, BackgroundImage } from '../../fixtures';
+import { globals, formStyles, selectStyles, optionTextStyles, overlayStyles } from '../../styles';
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
-const ImagePickerManager = require('NativeModules').ImagePickerManager;
-const SolidColors = ['red','deepPurple','indigo','teal','orange','blueGrey','purple','green'];
 
-const TechnologyList = ({ technologies, handlePress }) => {
-  return (
-    <View style={styles.techOuterContainer}>
-      {technologies.map((technology, idx) => (
-        <TouchableOpacity key={idx} style={styles.techContainer} onPress={() => handlePress(technology)}>
-          <Text style={styles.technologyList}>{technology}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  )
-};
+const styles = formStyles;
+
+function setErrorMsg({ location, name }){
+  if (! location ){
+    return 'You must provide a location.';
+  } else if (! name ){
+    return 'You must provide a name.';
+  } else {
+    return '';
+  }
+}
+const TechnologyList = ({ technologies, handlePress }) => (
+  <View style={styles.textContainer}>
+    {technologies.map((technology, idx) => (
+      <TouchableOpacity key={idx} onPress={() => handlePress(idx)} style={styles.technology}>
+        <Text style={[styles.h6, globals.primaryText]}>{technology}</Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)
 
 class CreateGroupConfirm extends Component{
   constructor(){
     super();
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.getOptions = this.getOptions.bind(this);
     this.showImagePicker = this.showImagePicker.bind(this);
     this.selectTechnology = this.selectTechnology.bind(this);
+    this.goBack = this.goBack.bind(this);
     this.removeTechnology = this.removeTechnology.bind(this);
     this.state = {
-      image: 'https://s3-us-west-2.amazonaws.com/assembliesapp/welcome%402x.png',
-      color: '#3F51B5',
-      technologies: [],
-      errorMsg: ''
+      color         : '#3F51B5',
+      errorMsg      : '',
+      image         : BackgroundImage,
+      technologies  : [],
     }
-  }
-  getOptions(){
-    return this.refs.optionList;
   }
   handleSubmit(){
-    console.log('PROPS', this.props);
-    let { color, image, technologies } = this.state;
-    let { name, description, location, groupName, addGroup, navigator, currentUser } = this.props;
-    if (! location ){
-      this.setState({ errorMsg: 'You must provide a location.'})
-    } else if (! name ){
-      this.setState({ errorMsg: 'You must provide a name.'})
-    } else if (! description){
-      this.setState({ errorMsg: 'You must provide a description.'})
-    } else {
-      let group = {
-        color,
-        image,
-        technologies,
-        description,
-        location ,
-        name: groupName,
-        members: [{
-          userId: currentUser.id,
-          role: 'owner',
-          joinedAt: new Date().valueOf(),
-          confirmed: true
-        }],
-        createdAt: new Date().valueOf()
-      };
-      console.log('GROUP PARAMS', group);
-      fetch(`${API}/groups`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(group)
-      })
-      .then(response => response.json())
-      .then(group => {
-        console.log('GROUP', group);
-        addGroup(group);
-        navigator.push({
-          name: 'Group',
-          group: group
-        })
-      })
-      .catch(err => console.log('ERR:', err))
-      .done();
+    let errorMsg = setErrorMsg(this.props);
+    if (errorMsg !== '') { /* return error if missing information */
+      this.setState({ errorMsg: errorMsg }); return;
     }
+    let group = {
+      color: this.state.color,
+      image: this.state.image,
+      technologies: this.state.technologies,
+      description: this.props.description,
+      location: this.props.location,
+      name: this.props.groupName,
+      members: [{
+        userId: this.props.currentUser.id,
+        role: 'owner',
+        joinedAt: new Date().valueOf(),
+        confirmed: true
+      }],
+      createdAt: new Date().valueOf()
+    };
+    fetch(`${API}/groups`, {
+      method: 'POST',
+      headers: Headers,
+      body: JSON.stringify(group)
+    })
+    .then(response => response.json())
+    .then(group => this.addGroup(group))
+    .catch(err => { console.log('ERR', err)})
+    .done();
   }
-  showImagePicker(){
-    ImagePickerManager.showImagePicker(ImageOptions, (response) => {
-      if (DEV) {console.log('Response = ', response);}
-
-      if (response.didCancel) {
-        if (DEV) {console.log('User cancelled image picker');}
-      }
-      else if (response.error) {
-        if (DEV) {console.log('ImagePickerManager Error: ', response.error);}
-      }
-      else if (response.customButton) {
-        if (DEV) {console.log('User tapped custom button: ', response.customButton);}
-      }
-      else {
-        const source = 'data:image/png;base64,' + response.data;
-        // if (DEV) {console.log('SRC', source);}
-        this.setState({ image: source });
-      }
+  addGroup(group){
+    console.log('GROUP', group)
+    this.props.addGroup(group);
+    this.props.navigator.push({
+      name: 'Group',
+      group: group
+    })
+  }
+  showImagePicker(){ /* select image from camera roll for groupImage */
+    ImagePicker.showImagePicker(ImageOptions, (response) => {
+      const image = 'data:image/png;base64,' + response.data;
+      this.setState({ image });
     });
   }
   selectTechnology(technology){
-    this.setState({ technologies: _.uniq(this.state.technologies.concat(technology))})
+    this.setState({
+      technologies: uniq(this.state.technologies.concat(technology))
+    });
   }
-  removeTechnology(technology){
-    this.setState({ technologies: this.state.technologies.filter(tech => tech !== technology)})
+  removeTechnology(index){
+    let { technologies } = this.state;
+    this.setState({
+      technologies: [
+      ...technologies.slice(0, index),
+      ...technologies.slice(index + 1)
+      ]
+    })
+  }
+  goBack(){
+    this.props.navigator.pop();
   }
   render(){
     let { navigator } = this.props;
     let { technologies, image, color, errorMsg } = this.state;
-    let titleConfig = {title: 'Create Assembly', tintColor: 'white'}
     return (
-      <View style={styles.container}>
+      <View style={[globals.flexContainer, globals.inactive]}>
         <NavigationBar
-          title={titleConfig}
+          title={{ title: 'Create Assembly', tintColor: 'white' }}
           tintColor={Colors.brandPrimary}
-          leftButton={<LeftNavButton handlePress={() => navigator.pop()}/>}
+          leftButton={<LeftNavButton handlePress={this.goBack}/>}
         />
-        <ScrollView
-          style={styles.formContainer}>
+        <ScrollView style={styles.formContainer} contentInset={{ bottom: 49 }}>
           <Text style={styles.h4}>{"My technologies"}</Text>
           <Select
             width={deviceWidth}
@@ -150,7 +134,7 @@ class CreateGroupConfirm extends Component{
             ref="select"
             styleText={optionTextStyles}
             style={selectStyles}
-            optionListRef={this.getOptions}
+            optionListRef={() => this.options}
             defaultValue="Add a technology"
             onSelect={this.selectTechnology}>
             {Technologies.map((tech, idx) => (
@@ -159,210 +143,41 @@ class CreateGroupConfirm extends Component{
               </Option>
             ))}
           </Select>
-          <OptionList ref='optionList' overlayStyles={overlayStyles}/>
+          <OptionList
+            ref={(el) => this.options = el }
+            overlayStyles={overlayStyles}
+          />
           <View>
-            { technologies.length ? <TechnologyList technologies={technologies} handlePress={this.removeTechnology}/> : null }
+            <TechnologyList technologies={technologies} handlePress={this.removeTechnology}/>
           </View>
-          <TouchableOpacity style={styles.addPhotoContainer} onPress={this.showImagePicker.bind(this)}>
+          <TouchableOpacity style={styles.avatarContainer} onPress={this.showImagePicker.bind(this)}>
             <Icon name="ios-camera" size={30} color={Colors.brandPrimary}/>
-            <Text style={styles.photoText}>Add a Photo</Text>
+            <Text style={[styles.h4, globals.primaryText]}>Add a Photo</Text>
           </TouchableOpacity>
-          <View style={{height: 200, alignItems: 'center', backgroundColor: 'black'}}>
-            <Image source={image === '' ? require('../../assets/images/welcome.png') : {uri: image}} style={styles.avatar}/>
+          <View style={styles.groupImageContainer}>
+            <Image source={{ uri: image ? image : BackgroundImage }} style={styles.groupImage}/>
           </View>
           <Text style={styles.h4}>What background color would you like?</Text>
-          <View style={styles.colorContainer}>
+          <View style={styles.colorsContainer}>
             {SolidColors.map((color, idx) => (
               <TouchableOpacity
                 key={idx}
-                onPress={()=>this.setState({color: Colors[color]})}
                 style={[styles.colorBox, {backgroundColor: Colors[color], borderColor: this.state.color == Colors[color] ? Colors.highlight : 'transparent' }]}
+                onPress={() => this.setState({color: Colors[color]})}
               >
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.error}>
+          <View style={[styles.error, globals.ma1]}>
             <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
         </ScrollView>
-        <TouchableOpacity style={[Globals.submitButton, {marginBottom: 50}]} onPress={this.handleSubmit}>
-          <Text style={Globals.submitButtonText}>Create group</Text>
+        <TouchableOpacity style={[styles.submitButton, styles.buttonMargin]} onPress={this.handleSubmit}>
+          <Text style={globals.largeButtonText}>Create group</Text>
         </TouchableOpacity>
       </View>
     )
   }
-}
-
-let styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  colorContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    flexWrap: 'wrap'
-  },
-  colorBox: {
-    flex: 1,
-    height: (deviceWidth / 4) - 20,
-    width: (deviceWidth / 4) - 20,
-    margin: 10,
-    borderWidth: 4,
-  },
-  error: {
-    backgroundColor: Colors.inactive,
-    paddingHorizontal: 15,
-    marginTop: 20
-  },
-  errorText: {
-    fontSize: 16,
-    fontWeight: '300',
-    color: 'red',
-    textAlign: 'center'
-  },
-  avatar: {
-    height: 200,
-    width: deviceWidth,
-    borderRadius: 3,
-    padding: 20,
-  },
-  technologyList:{
-    textAlign: 'left',
-    fontSize: 18,
-    fontWeight: 'bold',
-    backgroundColor: 'transparent',
-    color: Colors.brandPrimary,
-    paddingHorizontal: 2,
-    paddingVertical: 4,
-  },
-  backButton: {
-    paddingLeft: 20,
-    backgroundColor: 'transparent',
-    paddingBottom: 10,
-  },
-  formContainer: {
-    backgroundColor: Colors.inactive,
-    flex: 1,
-    paddingTop: 15,
-  },
-  submitButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.brandPrimary,
-    height: 80,
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 25,
-    fontWeight: '400'
-  },
-  h4: {
-    fontSize: 20,
-    fontWeight: '300',
-    marginTop: 15,
-    color: 'black',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  formField: {
-    backgroundColor: 'white',
-    height: 50,
-    paddingTop: 5,
-    marginBottom: 10,
-  },
-  techContainer: {
-    paddingHorizontal: 2,
-    marginHorizontal: 2,
-    marginVertical: 4,
-  },
-  largeFormField: {
-    backgroundColor: 'white',
-    height: 100,
-  },
-  addPhotoContainer: {
-    backgroundColor: 'white',
-    marginVertical: 15,
-    marginHorizontal: (deviceWidth - 250) / 2,
-    width: 250,
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoText: {
-    fontSize: 18,
-    paddingHorizontal: 10,
-    color: Colors.brandPrimary
-  },
-  input: {
-    color: '#ccc',
-    fontSize: 18,
-    fontWeight: '300',
-    height: 40,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  largeInput: {
-    color: '#777',
-    fontSize: 18,
-    backgroundColor: 'white',
-    fontWeight: '300',
-    height: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  formField:{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    backgroundColor: 'white',
-    marginVertical: 25,
-  },
-  formName:{
-    fontWeight: '300',
-    fontSize: 20,
-  },
-  techContainer: {
-    paddingHorizontal: 2,
-    marginHorizontal: 2,
-    marginVertical: 4,
-  },
-  techOuterContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 10
-  },
-});
-
-let selectStyles = {
-  backgroundColor: 'white',
-  justifyContent: 'center',
-  paddingLeft: 10,
-  borderTopWidth: 0,
-  borderBottomWidth: 0,
-};
-
-let optionTextStyles = {
-  fontSize: 18,
-  fontWeight: '300',
-}
-
-let overlayStyles = {
-  position: 'relative',
-  width: window.width,
-  height: window.height,
-  flex : 1,
-  justifyContent : "flex-start",
-  alignItems : "center",
-  backgroundColor : "#ffffff",
 };
 
 export default CreateGroupConfirm;

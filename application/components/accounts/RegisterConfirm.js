@@ -105,9 +105,7 @@ class RegisterConfirm extends Component{
       body: JSON.stringify(user)
     })
     .then(response => response.json())
-    .then(user => {
-      this.loginUser(this.props.email, this.props.password);
-    })
+    .then(user => this.loginUser(this.props.email, this.props.password))
     .catch(err => {})
     .done();
   }

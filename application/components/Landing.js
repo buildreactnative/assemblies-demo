@@ -11,7 +11,7 @@ import Colors from '../styles/colors';
 import { landingStyles } from '../styles';
 import { globals } from '../styles';
 
-const backgroundImageSrc = 'https://s3-us-west-2.amazonaws.com/assembliesapp/welcome%402x.png';
+import { BackgroundImage } from '../fixtures';
 const styles = landingStyles;
 
 class Landing extends Component{
@@ -30,7 +30,7 @@ class Landing extends Component{
     return (
       <View style={styles.container}>
         <View style={styles.container}>
-          <Image style={styles.backgroundImage} source={{ uri: backgroundImageSrc }}/>
+          <Image style={styles.backgroundImage} source={{ uri: BackgroundImage }}/>
         </View>
         <View style={globals.flexCenter}>
           <Image style={styles.logo} source={require('../assets/images/logo.png')}/>

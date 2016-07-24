@@ -484,6 +484,31 @@ export const formStyles = StyleSheet.create({
   technology: {
     marginHorizontal: 4,
     marginVertical: 8,
+  },
+  groupImageContainer: {
+    height: 200,
+    alignItems: 'center',
+    backgroundColor: 'black'
+  },
+  groupImage: {
+    height: 200,
+    width: deviceWidth,
+    borderRadius: 3,
+    padding: 20,
+  },
+  colorsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    flexWrap: 'wrap'
+  },
+  colorBox: {
+    flex: 1,
+    height: (deviceWidth / 4) - 20,
+    width: (deviceWidth / 4) - 20,
+    margin: 10,
+    borderWidth: 4,
   }
 })
 
@@ -527,6 +552,9 @@ export const globals = StyleSheet.create({
   },
   ph2: {
     paddingHorizontal: 20
+  },
+  ma1: {
+    margin: 10
   },
   mt1: {
     marginTop: 10

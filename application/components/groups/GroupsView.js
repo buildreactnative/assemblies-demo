@@ -73,6 +73,7 @@ class GroupsView extends Component{
     this.updateGroup(group);
   }
   addGroup(group){
+    console.log('GROUPS VIEW GROUP', group)
     this.setState({
       groups: [
         ...this.state.groups, group

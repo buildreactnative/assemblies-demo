@@ -1,5 +1,18 @@
 import _ from 'underscore';
 
+export const SolidColors = [
+  'red',
+  'deepPurple',
+  'indigo',
+  'teal',
+  'orange',
+  'blueGrey',
+  'purple',
+  'green',
+];
+
+export const BackgroundImage = 'https://s3-us-west-2.amazonaws.com/assembliesapp/welcome%402x.png';
+
 export const FAKE_USERS = [
   { id: 0, firstName: 'Paul', lastName: 'Graham', avatarUrl: 'https://pbs.twimg.com/profile_images/1824002576/pg-railsconf_400x400.jpg' },
   { id: 1, firstName: 'Dan', lastName: 'Abramov', avatarUrl: 'https://pbs.twimg.com/profile_images/553711083064541184/9VsY9i09.jpeg' },
